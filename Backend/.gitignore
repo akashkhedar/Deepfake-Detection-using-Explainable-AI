@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Data
+dataset/
+dataset_mini/
+
+# Models
+*.pth
+*.pt
+
+# Logs
+*.log
+dataset_summary.json
