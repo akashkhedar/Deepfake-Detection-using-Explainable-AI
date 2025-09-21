@@ -1,7 +1,6 @@
 # Core ML/DL packages
 torch>=2.0.0
 torchvision>=0.15.0
-torchaudio>=2.0.0
 
 # Data science and analysis
 numpy>=1.21.0
@@ -29,7 +28,6 @@ python-dotenv>=1.0.0
 torchcam>=0.3.0
 
 # AI/LLM APIs
-openai>=1.100.0
 google-generativeai>=0.3.0
 
 # Optional: For Jupyter notebooks (if needed)
