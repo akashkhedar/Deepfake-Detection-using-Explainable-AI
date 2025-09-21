@@ -5,11 +5,14 @@ import Toolbar from "@mui/material/Toolbar";
 
 export default function Navbar() {
   const handleGitHub = () => {
-    window.open("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "_blank");
+    window.open(
+      "https://github.com/akashkhedar/Deepfake-Detection-using-Explainable-AI",
+      "_blank"
+    );
   };
   return (
     <AppBar
-      position="static"
+      position="sticky"
       elevation={0}
       sx={{
         bgcolor: "transparent",

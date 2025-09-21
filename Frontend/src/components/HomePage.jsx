@@ -1,6 +1,6 @@
 import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import Navbar from "./Navbar";
-import ModelSection from "./ModelSection";
+import Navbar from "./Navbar/Navbar";
+import ModelSection from "./ModelSection/ModelSection";
 
 // Create a dark theme
 const darkTheme = createTheme({
