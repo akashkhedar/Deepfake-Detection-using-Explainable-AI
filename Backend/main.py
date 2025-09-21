@@ -74,12 +74,13 @@ preprocess = transforms.Compose(
 )
 
 
-def get_cam_overlay(img_tensor, cam):
+def get_cam_overlay(img_tensor, cam, original_size):
     if cam.dim() == 3:
         cam = cam.squeeze(0)
 
     cam = cam.detach().cpu().numpy().astype(np.float32)
-    cam = cv2.resize(cam, (224, 224), interpolation=cv2.INTER_LINEAR)
+    # Resize CAM to match original image size instead of 224x224
+    cam = cv2.resize(cam, original_size, interpolation=cv2.INTER_LINEAR)
 
     cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
 
@@ -87,12 +88,18 @@ def get_cam_overlay(img_tensor, cam):
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
     heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
 
-    img = img_tensor.detach().cpu().numpy().transpose(1, 2, 0)
+    # Use original image data instead of processed tensor
+    img_normalized = img_tensor.detach().cpu().numpy().transpose(1, 2, 0)
     mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
     std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
-    img = np.clip(std * img + mean, 0, 1)
+    img_denormalized = np.clip(std * img_normalized + mean, 0, 1)
 
-    overlay = 0.4 * heatmap + 0.6 * img
+    # Resize denormalized image to original size
+    img_original_size = cv2.resize(
+        img_denormalized, original_size, interpolation=cv2.INTER_LINEAR
+    )
+
+    overlay = 0.4 * heatmap + 0.6 * img_original_size
     overlay = np.clip(overlay, 0, 1)
 
     overlay_uint8 = (overlay * 255).astype(np.uint8)
@@ -139,6 +146,7 @@ async def root():
 async def predict(file: UploadFile = File(...)):
     try:
         image = Image.open(file.file).convert("RGB")
+        original_size = image.size  # (width, height)
         input_tensor = preprocess(image).unsqueeze(0).to(DEVICE)
         input_tensor.requires_grad_(True)
 
@@ -148,7 +156,7 @@ async def predict(file: UploadFile = File(...)):
 
         # GradCAM
         cam = cam_extractor(pred_class, output)[0]
-        overlay_base64 = get_cam_overlay(input_tensor.cpu()[0], cam)
+        overlay_base64 = get_cam_overlay(input_tensor.cpu()[0], cam, original_size)
 
         # Explanation
         if pred_class == 0:  # Fake → use Gemini with heatmap

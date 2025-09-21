@@ -44,28 +44,6 @@ const ExplanationBox = ({ explanation, isAnalyzing, prediction }) => {
     return "Why is this image fake?";
   };
 
-  const getIcon = () => {
-    if (isError) {
-      return (
-        <Error
-          sx={{ fontSize: isMobile ? 28 : 32, color: styling.iconColor, mr: 2 }}
-        />
-      );
-    } else if (isReal) {
-      return (
-        <CheckCircle
-          sx={{ fontSize: isMobile ? 28 : 32, color: styling.iconColor, mr: 2 }}
-        />
-      );
-    } else {
-      return (
-        <Psychology
-          sx={{ fontSize: isMobile ? 28 : 32, color: styling.iconColor, mr: 2 }}
-        />
-      );
-    }
-  };
-
   return (
     <Paper
       sx={{
@@ -76,14 +54,26 @@ const ExplanationBox = ({ explanation, isAnalyzing, prediction }) => {
         borderColor: styling.borderColor,
         mt: 3,
         minHeight: isMobile ? 200 : 250,
+        textAlign: "center", // center everything
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", mb: isMobile ? 2 : 3 }}>
-        {getIcon()}
-        <Typography variant={isMobile ? "h6" : "h5"} color={styling.textColor}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          mb: isMobile ? 2 : 3,
+        }}
+      >
+        <Typography
+          variant={isMobile ? "h6" : "h5"}
+          color={styling.textColor}
+          sx={{ fontWeight: "bold" }}
+        >
           {getTitle()}
         </Typography>
       </Box>
+
       {explanation ? (
         <Typography
           variant={isMobile ? "body2" : "body1"}

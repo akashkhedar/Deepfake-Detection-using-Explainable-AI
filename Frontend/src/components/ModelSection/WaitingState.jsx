@@ -1,7 +1,6 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Analytics } from "@mui/icons-material";
-import { useMediaQuery, useTheme } from "@mui/material";
 
 const WaitingState = () => {
   const theme = useTheme();
@@ -14,8 +13,9 @@ const WaitingState = () => {
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        minHeight: isMobile ? 200 : 300,
-        p: isMobile ? 2 : 0,
+        width: isMobile ? "100%" : "25rem",
+        height: isMobile ? "20rem" : "29.5rem", // Smaller height on mobile
+        flexShrink: 0,
       }}
     >
       <Box>
@@ -35,7 +35,7 @@ const WaitingState = () => {
           Ready for Analysis
         </Typography>
         <Typography
-          variant={isMobile ? "body2" : "body2"}
+          variant="body2"
           color="text.secondary"
           sx={{
             maxWidth: isMobile ? 280 : 400,

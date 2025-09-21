@@ -16,8 +16,6 @@ const useImageAnalysis = () => {
     try {
       const formData = new FormData();
       formData.append("file", imageFile);
-      console.log("Sending request to backend...", formData);
-
       const response = await fetch("http://localhost:8000/predict/", {
         method: "POST",
         body: formData,

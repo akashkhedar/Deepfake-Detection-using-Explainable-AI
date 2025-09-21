@@ -58,22 +58,64 @@ const ModelSection = () => {
           AI-Powered DeepFake Detection
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-          Upload an image to analyze whether it's real or AI-generated
+          Upload an image to analyze whether it's REAL or FAKE
         </Typography>
       </Box>
 
-      {/* Main Content Grid - Centered */}
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 4 }}>
-        <Grid container spacing={4} sx={{ maxWidth: "1000px" }}>
-          {/* Left Side - Image Upload/Display */}
-          <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%", bgcolor: "background.paper" }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-                  <CloudUpload sx={{ mr: 1, verticalAlign: "middle" }} />
-                  Upload Image
-                </Typography>
+      {/* Main Content */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch",
+          gap: 4,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: "space-evenly",
+            alignItems: "flex-start",
+            gap: isMobile ? 3 : 4,
+          }}
+        >
+          {/* Left Box - Input Image */}
+          <Card
+            sx={{
+              bgcolor: "background.paper",
+              display: "flex",
+              flexDirection: "column",
+              width: isMobile ? "100%" : "auto",
+              maxWidth: isMobile ? "400px" : "none",
+            }}
+          >
+            <CardContent
+              sx={{
+                p: 3,
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden", // Prevent overflow
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ mb: 3, flexShrink: 0 }}
+              >
+                <CloudUpload sx={{ mr: 1, verticalAlign: "middle" }} />
+                Upload Image
+              </Typography>
 
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: 0,
+                }}
+              >
                 {!selectedImage ? (
                   <ImageUploadArea onImageSelect={handleFileSelect} />
                 ) : (
@@ -84,96 +126,104 @@ const ModelSection = () => {
                     onReset={handleReset}
                   />
                 )}
+              </Box>
 
-                {!selectedImage && (
-                  <CardActions sx={{ justifyContent: "center", pt: 3 }}>
-                    <Button
-                      variant="contained"
-                      startIcon={<ImageSearch />}
-                      size="large"
-                      onClick={handleImageUpload}
-                      sx={{
+              {!selectedImage && (
+                <CardActions
+                  sx={{ justifyContent: "center", pt: 3, flexShrink: 0 }}
+                >
+                  <Button
+                    variant="contained"
+                    startIcon={<ImageSearch />}
+                    size="large"
+                    onClick={handleImageUpload}
+                    sx={{
+                      background:
+                        "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+                      px: 4,
+                      "&:hover": {
                         background:
-                          "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-                        px: 4,
-                        "&:hover": {
-                          background:
-                            "linear-gradient(45deg, #FE6B8B 60%, #FF8E53 100%)",
-                        },
-                      }}
-                    >
-                      Choose Image
-                    </Button>
-                  </CardActions>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+                          "linear-gradient(45deg, #FE6B8B 60%, #FF8E53 100%)",
+                      },
+                    }}
+                  >
+                    Choose Image
+                  </Button>
+                </CardActions>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Right Side - Analysis Results */}
-          <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%", bgcolor: "background.paper" }}>
-              <CardContent sx={{ p: 3 }}>
-                <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-                  <Analytics sx={{ mr: 1, verticalAlign: "middle" }} />
-                  Analysis Results
-                </Typography>
+          {/* Right Box - Heatmap */}
+          <Card
+            sx={{
+              bgcolor: "background.paper",
+              display: "flex",
+              flexDirection: "column",
+              width: isMobile ? "100%" : "auto",
+              maxWidth: isMobile ? "400px" : "none",
+            }}
+          >
+            <CardContent
+              sx={{
+                p: 3,
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden", // Prevent overflow
+              }}
+            >
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ mb: 3, flexShrink: 0 }}
+              >
+                <Analytics sx={{ mr: 1, verticalAlign: "middle" }} />
+                Analysis Results
+              </Typography>
 
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 {!selectedImage ? (
                   <WaitingState />
                 ) : (
-                  <Box>
-                    <Typography variant="h6" gutterBottom>
-                      Attention Heatmap
-                    </Typography>
-                    <HeatmapDisplay
-                      heatmapUrl={heatmapUrl}
-                      isAnalyzing={isAnalyzing}
-                    />
-                  </Box>
+                  <HeatmapDisplay
+                    heatmapUrl={heatmapUrl}
+                    isAnalyzing={isAnalyzing}
+                    prediction={prediction}
+                  />
                 )}
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
 
-      {/* Error Section - Full Width Below */}
-      {selectedImage && prediction === "error" && (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Box sx={{ width: "100%", maxWidth: "1000px" }}>
+        {/* Bottom Box - Explanation (full width) */}
+        <Box>
+          {selectedImage && prediction === "error" && (
             <ExplanationBox
               explanation={explanation}
               isAnalyzing={isAnalyzing}
               prediction={prediction}
             />
-          </Box>
-        </Box>
-      )}
+          )}
 
-      {/* Explanation Section - Full Width Below (for both fake and real) */}
-      {selectedImage &&
-        (prediction === "fake" || prediction === "real") &&
-        explanation && (
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <Box sx={{ width: "100%", maxWidth: "1000px" }}>
+          {selectedImage &&
+            (prediction === "fake" || prediction === "real") &&
+            explanation && (
               <ExplanationBox
                 explanation={explanation}
                 isAnalyzing={isAnalyzing}
                 prediction={prediction}
               />
-            </Box>
-          </Box>
-        )}
-
-      {/* Fallback Real Image Message (when no explanation) */}
-      {selectedImage && prediction === "real" && !explanation && (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Box sx={{ width: "100%", maxWidth: "1000px" }}>
-            <RealImageMessage />
-          </Box>
+            )}
         </Box>
-      )}
+      </Box>
     </Container>
   );
 };

@@ -1,31 +1,27 @@
-import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Chip,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { CheckCircle, Warning } from "@mui/icons-material";
+import { Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
 
-const ImageDisplay = ({ image, prediction, isAnalyzing, onReset }) => {
+const ImageDisplay = ({ image, isAnalyzing, onReset }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (
-    <Box>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Box
         sx={{
           position: "relative",
-          width: "100%",
-          aspectRatio: "1 / 1", // Force square
+          width: isMobile ? "100%" : "25rem",
+          height: isMobile ? "20rem" : "25rem", // Smaller height on mobile
           borderRadius: 3,
           overflow: "hidden",
           border: "2px solid",
           borderColor: "primary.main",
           mb: 2,
+          bgcolor: "black",
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <Box
@@ -37,40 +33,15 @@ const ImageDisplay = ({ image, prediction, isAnalyzing, onReset }) => {
             height: "100%",
             objectFit: "contain",
             display: "block",
-            backgroundColor: "black",
           }}
         />
       </Box>
-
-      {/* Prediction Status */}
-      {(prediction || isAnalyzing) && (
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          {isAnalyzing ? (
-            <Chip
-              label="Analyzing..."
-              color="info"
-              size={isMobile ? "medium" : "large"}
-              sx={{ fontSize: isMobile ? "0.875rem" : "1rem", p: 1 }}
-            />
-          ) : (
-            <Chip
-              icon={prediction === "real" ? <CheckCircle /> : <Warning />}
-              label={
-                prediction === "real" ? "Real Image" : "Fake Image Detected"
-              }
-              color={prediction === "real" ? "success" : "error"}
-              size={isMobile ? "medium" : "large"}
-              sx={{ fontSize: isMobile ? "0.875rem" : "1rem", p: 1 }}
-            />
-          )}
-        </Box>
-      )}
 
       <Button
         variant="outlined"
         fullWidth
         onClick={onReset}
-        sx={{ mt: 1 }}
+        sx={{ mt: "auto", flexShrink: 0 }}
         disabled={isAnalyzing}
       >
         Upload Different Image

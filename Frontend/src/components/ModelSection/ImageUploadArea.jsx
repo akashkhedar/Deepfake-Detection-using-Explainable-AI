@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
 import PropTypes from "prop-types";
 
@@ -57,18 +57,18 @@ const ImageUploadArea = ({ onImageSelect }) => {
         border: "2px dashed",
         borderColor: isDragOver ? "secondary.main" : "primary.main",
         borderRadius: 3,
-        p: isMobile ? 3 : 4,
+        p: isMobile ? 2 : 3,
         textAlign: "center",
         bgcolor: isDragOver ? "action.selected" : "action.hover",
         transition: "all 0.3s ease",
         cursor: "pointer",
-        minHeight: isMobile ? 250 : 300,
-        width: "100%",
-        aspectRatio: "1", // Make it square
+        width: isMobile ? "100%" : "25rem",
+        height: isMobile ? "20rem" : "25rem", // Smaller height on mobile
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        flexShrink: 0,
         "&:hover": {
           borderColor: "secondary.main",
           bgcolor: "action.selected",
@@ -82,19 +82,15 @@ const ImageUploadArea = ({ onImageSelect }) => {
     >
       <CloudUpload
         sx={{
-          fontSize: isMobile ? 50 : 60,
+          fontSize: isMobile ? 40 : 50,
           color: isDragOver ? "secondary.main" : "primary.main",
           mb: 2,
         }}
       />
-      <Typography variant={isMobile ? "body1" : "h6"} gutterBottom>
+      <Typography variant={isMobile ? "body2" : "body1"} gutterBottom>
         {isDragOver ? "Drop your image here" : "Drop your image here"}
       </Typography>
-      <Typography
-        variant={isMobile ? "caption" : "body2"}
-        color="text.secondary"
-        paragraph
-      >
+      <Typography variant="caption" color="text.secondary" paragraph>
         or click to browse files
       </Typography>
       <Typography variant="caption" color="text.secondary">
@@ -102,10 +98,6 @@ const ImageUploadArea = ({ onImageSelect }) => {
       </Typography>
     </Box>
   );
-};
-
-ImageUploadArea.propTypes = {
-  onImageSelect: PropTypes.func.isRequired,
 };
 
 export default ImageUploadArea;
