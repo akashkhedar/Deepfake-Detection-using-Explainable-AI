@@ -151,21 +151,23 @@ const ModelSection = () => {
         </Box>
       )}
 
-      {/* Explanation Section - Full Width Below */}
-      {selectedImage && prediction === "fake" && (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Box sx={{ width: "100%", maxWidth: "1000px" }}>
-            <ExplanationBox
-              explanation={explanation}
-              isAnalyzing={isAnalyzing}
-              prediction={prediction}
-            />
+      {/* Explanation Section - Full Width Below (for both fake and real) */}
+      {selectedImage &&
+        (prediction === "fake" || prediction === "real") &&
+        explanation && (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <Box sx={{ width: "100%", maxWidth: "1000px" }}>
+              <ExplanationBox
+                explanation={explanation}
+                isAnalyzing={isAnalyzing}
+                prediction={prediction}
+              />
+            </Box>
           </Box>
-        </Box>
-      )}
+        )}
 
-      {/* Real Image Message - Full Width Below */}
-      {selectedImage && prediction === "real" && (
+      {/* Fallback Real Image Message (when no explanation) */}
+      {selectedImage && prediction === "real" && !explanation && (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Box sx={{ width: "100%", maxWidth: "1000px" }}>
             <RealImageMessage />

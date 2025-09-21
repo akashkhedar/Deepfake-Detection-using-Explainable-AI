@@ -37,10 +37,15 @@ const useImageAnalysis = () => {
         setHeatmapUrl(`data:image/png;base64,${result.heatmap}`);
       }
 
-      // Set explanation only for fake images
-      if (predictionLower === "fake") {
+      // Set explanation from backend (for both fake and real images)
+      if (result.explanation) {
+        setExplanation(result.explanation);
+      } else {
+        // Fallback explanation if backend doesn't provide one
         setExplanation(
-          "The model detected artificial patterns commonly found in AI-generated images. Key indicators include unusual texture inconsistencies, unnatural lighting gradients, and synthetic-looking features. The attention heatmap shows areas where the model detected digital artifacts and inconsistent patterns typical of deepfake generation."
+          predictionLower === "fake"
+            ? "The model detected artificial patterns commonly found in AI-generated images."
+            : "The model detected patterns consistent with authentic images."
         );
       }
     } catch (error) {
