@@ -650,7 +650,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/akashkhedar/Deepfake-Detection-using-Explainable-AI/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/akashkhedar/Deepfake-Detection-using-Explainable-AI/discussions)
-- **Email**: akashkhedar@example.com
+- **Email**: akashkhedar262@gmail.com
 
 ## 📊 Project Stats
 
