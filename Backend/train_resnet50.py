@@ -3,19 +3,25 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms, models
+from torchvision.models import resnet50, ResNet50_Weights
 from torch.utils.data import DataLoader
-from torch.amp import GradScaler, autocast  # updated import
+from torch.amp import GradScaler, autocast
 from tqdm import tqdm
 
 # =====================
 # Config
 # =====================
-DATA_DIR = "dataset_mini"  # change to "dataset" later for full training
+DATA_DIR = "./dataset"
 BATCH_SIZE = 16
 NUM_EPOCHS = 8
 LR = 1e-4
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-SAVE_PATH = "resnet18_best.pth"
+print("Device:", DEVICE)
+
+SAVE_PATH = "resnet50_best.pth"
+CHECKPOINT_PATH = (
+    "#"  # separate from best model
+)
 
 # =====================
 # Data Augmentations
@@ -50,7 +56,6 @@ def main():
         os.path.join(DATA_DIR, "validation"), transform=val_transforms
     )
 
-    # num_workers=0 for Windows stability
     train_loader = DataLoader(
         train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0
     )
@@ -64,28 +69,42 @@ def main():
     # =====================
     # Model Setup
     # =====================
-    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 2)  # binary classification
+    model.fc = nn.Linear(num_ftrs, 2)
     model = model.to(DEVICE)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-2)
+    scaler = GradScaler("cuda")
 
-    scaler = GradScaler("cuda")  # updated
+    start_epoch = 0
+    best_acc = 0.0
+
+    # =====================
+    # Resume from checkpoint if available
+    # =====================
+    if os.path.exists(CHECKPOINT_PATH):
+        print(f"🔄 Loading checkpoint from '{CHECKPOINT_PATH}' ...")
+        checkpoint = torch.load(CHECKPOINT_PATH, map_location=DEVICE)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        scaler.load_state_dict(checkpoint["scaler_state_dict"])
+        start_epoch = checkpoint["epoch"] + 1
+        best_acc = checkpoint["best_acc"]
+        print(f"✅ Resumed from epoch {start_epoch} with best val acc: {best_acc:.4f}")
 
     # =====================
     # Training Loop
     # =====================
-    best_acc = 0.0
-
-    for epoch in range(NUM_EPOCHS):
+    for epoch in range(start_epoch, NUM_EPOCHS):
         print(f"\nEpoch {epoch+1}/{NUM_EPOCHS}")
         print("-" * 20)
 
         # Training
         model.train()
         running_loss, running_corrects = 0.0, 0
+
         for inputs, labels in tqdm(train_loader, desc="Training"):
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
@@ -104,7 +123,6 @@ def main():
 
         epoch_loss = running_loss / len(train_dataset)
         epoch_acc = running_corrects.double() / len(train_dataset)
-
         print(f"Train Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}")
 
         # Validation
@@ -116,27 +134,39 @@ def main():
                 with autocast("cuda"):
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
-
                 _, preds = torch.max(outputs, 1)
                 val_loss += loss.item() * inputs.size(0)
                 val_corrects += torch.sum(preds == labels.data)
 
-        val_loss = val_loss / len(val_dataset)
+        val_loss /= len(val_dataset)
         val_acc = val_corrects.double() / len(val_dataset)
-
         print(f"Val Loss: {val_loss:.4f} Acc: {val_acc:.4f}")
 
+        # =====================
         # Save best model
+        # =====================
         if val_acc > best_acc:
             best_acc = val_acc
             torch.save(model.state_dict(), SAVE_PATH)
-            print(f"✅ Best model saved with acc: {best_acc:.4f}")
+            print(f"💾 Best model updated with acc: {best_acc:.4f}")
+
+        # =====================
+        # Save checkpoint after every epoch
+        # =====================
+        torch.save(
+            {
+                "epoch": epoch,
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "scaler_state_dict": scaler.state_dict(),
+                "best_acc": best_acc,
+            },
+            CHECKPOINT_PATH,
+        )
+        print(f"🧩 Checkpoint saved at epoch {epoch+1}")
 
     print(f"\nTraining complete. Best Val Acc: {best_acc:.4f}")
 
 
-# =====================
-# Windows-safe entry point
-# =====================
 if __name__ == "__main__":
     main()

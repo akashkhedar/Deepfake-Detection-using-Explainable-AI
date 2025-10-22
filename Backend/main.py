@@ -48,11 +48,12 @@ app.add_middleware(
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Load model
-model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+model = models.resnet50(weights=None)  # no pretrained weights
+
 num_ftrs = model.fc.in_features
 model.fc = torch.nn.Linear(num_ftrs, 2)  # 2 classes: Real / Fake
 
-state_dict = torch.load("resnet18_best.pth", map_location=DEVICE)
+state_dict = torch.load("./resnet50_best.pth", map_location=DEVICE)
 model.load_state_dict(state_dict)
 
 model = model.to(DEVICE)
@@ -124,7 +125,7 @@ def call_gemini_with_heatmap(pred_class, overlay_base64):
     """
 
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(
             [
                 prompt,

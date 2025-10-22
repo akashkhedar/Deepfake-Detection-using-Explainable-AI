@@ -20,7 +20,7 @@ A sophisticated full-stack deepfake detection system that combines state-of-the-
 
 ### 🔬 **Technical Features**
 
-- **ResNet18 Architecture**: Pre-trained CNN fine-tuned for deepfake detection
+- **ResNet50 Architecture**: Pre-trained CNN fine-tuned for deepfake detection
 - **GradCAM Visualization**: Visual attention maps highlighting suspicious regions
 - **OpenCV Optimization**: High-performance image processing and heatmap generation
 - **Mobile-Responsive Design**: Optimized UI for desktop and mobile devices
@@ -38,7 +38,7 @@ A sophisticated full-stack deepfake detection system that combines state-of-the-
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   React Frontend │◄──►│   FastAPI Backend │◄──►│  ML Model + AI  │
 │                 │    │                  │    │                 │
-│ • Material-UI   │    │ • PyTorch Model  │    │ • ResNet18      │
+│ • Material-UI   │    │ • PyTorch Model  │    │ • ResNet50      │
 │ • Drag & Drop   │    │ • GradCAM        │    │ • GradCAM       │
 │ • Responsive    │    │ • OpenCV         │    │ • Gemini AI     │
 │ • Modular       │    │ • CORS           │    │ • Explanations  │
@@ -51,12 +51,12 @@ A sophisticated full-stack deepfake detection system that combines state-of-the-
 ML Project/
 ├── Backend/                    # FastAPI Server & ML Components
 │   ├── main.py                # FastAPI application with Gemini integration
-│   ├── train_resnet18.py       # Model training script
-│   ├── test_resnet18.py        # Model evaluation script
+│   ├── train_resnet50.py       # Model training script (update: now uses ResNet50)
+│   ├── test_resnet50.py        # Model evaluation script (update: now uses ResNet50)
 │   ├── check_dataset.py        # Dataset validation utilities
 │   ├── make_mini.py            # Mini dataset creator
 │   ├── requirements.txt        # Python dependencies
-│   ├── resnet18_best.pth       # Trained model weights
+│   ├── resnet18_best.pth       # Trained model weights (binary classifier -- filename kept for backward compatibility)
 │   ├── .env                    # Environment variables (API keys)
 │   └── venv/                   # Python virtual environment
 │
@@ -174,6 +174,8 @@ BACKEND_HOST=localhost
 BACKEND_PORT=8000
 
 # Model Configuration
+# NOTE: The codebase now uses ResNet50. The checkpoint filename in this repo remains
+# `resnet18_best.pth` for backward compatibility; update MODEL_PATH if you rename the file.
 MODEL_PATH=resnet18_best.pth
 DEVICE=auto  # auto, cpu, cuda
 ```
@@ -276,7 +278,7 @@ print(f"Explanation: {result['explanation']}")
 
 ### Model Architecture
 
-- **Base Model**: ResNet18 pre-trained on ImageNet
+- **Base Model**: ResNet18 pre-trained on ImageNet -**Base Model**: ResNet50 pre-trained on ImageNet
 - **Modification**: Final layer adapted for binary classification (Real/Fake)
 - **Input Size**: 224×224×3 RGB images
 - **Output**: 2 classes with softmax probabilities
@@ -285,7 +287,7 @@ print(f"Explanation: {result['explanation']}")
 
 ```bash
 # Train the model
-python train_resnet18.py
+python train_resnet50.py
 
 # Configuration options:
 # - DATA_DIR: Dataset directory
@@ -305,7 +307,7 @@ python train_resnet18.py
 
 ```bash
 # Evaluate the trained model
-python test_resnet18.py
+python test_resnet50.py
 ```
 
 #### Evaluation Metrics
@@ -321,7 +323,7 @@ The system uses GradCAM (Gradient-weighted Class Activation Mapping) to provide 
 
 ```python
 # GradCAM implementation
-cam_extractor = GradCAM(model, target_layer=model.layer4[-1].conv2)
+cam_extractor = GradCAM(model, target_layer=model.layer4[-1].conv3)
 cam = cam_extractor(pred_class, output)[0]
 ```
 
@@ -656,9 +658,45 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **🔧 Languages**: Python, JavaScript, CSS, HTML
 - **📚 Framework**: PyTorch, React, FastAPI
-- **🎯 Accuracy**: 95%+ on validation dataset
+- **🎯 Best Validation Accuracy**: 98.57% (after 8 epochs)
+- **🧪 Test Accuracy**: 88% on the held-out test set
 - **⚡ Performance**: <2s average inference time
 - **📱 Compatibility**: Desktop, tablet, mobile responsive
+
+## 🧾 Training Results
+
+Below are the training and validation metrics recorded during the 8-epoch training run (logs captured from the training terminal). The model used: ResNet50 (final layer adapted for binary classification).
+
+Epoch-by-epoch summary:
+
+- Epoch 1/8 — Train Loss: 0.0691 Acc: 0.9737 | Val Loss: 0.0738 Acc: 0.9727 (Checkpoint saved)
+- Epoch 2/8 — Train Loss: 0.0417 Acc: 0.9837 | Val Loss: 0.0956 Acc: 0.9620 (Checkpoint saved)
+- Epoch 3/8 — Train Loss: 0.0341 Acc: 0.9862 | Val Loss: 0.0644 Acc: 0.9772 (Best so far)
+- Epoch 4/8 — Train Loss: 0.0307 Acc: 0.9876 | Val Loss: 0.0475 Acc: 0.9827 (Best so far)
+- Epoch 5/8 — Train Loss: 0.0269 Acc: 0.9891 | Val Loss: 0.0653 Acc: 0.9759
+- Epoch 6/8 — Train Loss: 0.0245 Acc: 0.9900 | Val Loss: 0.0544 Acc: 0.9797
+- Epoch 7/8 — Train Loss: 0.0220 Acc: 0.9910 | Val Loss: 0.0478 Acc: 0.9844 (Best so far)
+- Epoch 8/8 — Train Loss: 0.0206 Acc: 0.9918 | Val Loss: 0.0438 Acc: 0.9857 (Final best)
+
+- Training complete. Best Validation Accuracy: 0.9857 (98.57%)
+
+Final classification report on the test set (10905 samples):
+
+        precision    recall  f1-score   support
+
+    Fake       0.81      0.98      0.89      5492
+    Real       0.97      0.77      0.86      5413
+
+accuracy 0.88 10905
+macro avg 0.89 0.88 0.88 10905
+weighted avg 0.89 0.88 0.88 10905
+
+Interpretation and notes:
+
+- The model achieves very high validation accuracy (98.57%) during training, indicating strong performance on the held-out validation split.
+- On the test set, overall accuracy is 88%. The class-wise breakdown shows the model is highly precise at detecting Real images (precision 0.97) but has lower recall for Real (0.77). Conversely, Fake images have high recall (0.98) but lower precision (0.81). This indicates the model tends to prefer predicting "Fake" slightly more often, catching most fakery but producing more false positives for the Fake class.
+- The macro- and weighted-average F1-scores (~0.88–0.89) indicate balanced performance across classes when accounting for both precision and recall.
+- Actionable next steps: tune class weights or thresholding to improve Real-class recall, collect more balanced/ diverse Real examples, and experiment with additional architectures or augmentation strategies.
 
 ---
 

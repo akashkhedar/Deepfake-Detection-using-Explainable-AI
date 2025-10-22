@@ -6,7 +6,6 @@ import torch.nn as nn
 from sklearn.metrics import confusion_matrix, classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib.pyplot as plt
 import numpy as np
 from torchcam.methods import GradCAM
 from torchvision.transforms.functional import to_pil_image
@@ -15,13 +14,13 @@ import torch.nn.functional as F
 # =====================
 # Config
 # =====================
-DATA_DIR = "dataset_mini"  # change to "dataset" for full
+DATA_DIR = "dataset"  # change to "dataset" for full testing
 BATCH_SIZE = 16
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-SAVE_PATH = "resnet18_best.pth"
+SAVE_PATH = "./resnet50_best.pth"
 
 # =====================
-# Transforms (same as val)
+# Transforms (same as validation)
 # =====================
 test_transforms = transforms.Compose(
     [
@@ -45,11 +44,11 @@ class_names = test_dataset.classes
 print("Classes:", class_names)
 
 # =====================
-# Load Model
+# Load Model (ResNet50)
 # =====================
-model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+model = models.resnet50(weights=None)  # no pretrained weights
 num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, 2)
+model.fc = nn.Linear(num_ftrs, len(class_names))  # dynamically match num classes
 model.load_state_dict(torch.load(SAVE_PATH, map_location=DEVICE))
 model = model.to(DEVICE)
 model.eval()
@@ -87,21 +86,19 @@ plt.ylabel("True")
 plt.title("Confusion Matrix")
 plt.show()
 
-
-# Switch model to evaluation mode
-model.eval()
-
+# =====================
+# Misclassified Samples
+# =====================
 misclassified_images = []
 misclassified_labels = []
 misclassified_preds = []
 
+model.eval()
 with torch.no_grad():
-    for inputs, labels in test_loader:  # test_loader like val_loader
+    for inputs, labels in test_loader:
         inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
         outputs = model(inputs)
         _, preds = torch.max(outputs, 1)
-
-        # Find wrong predictions
         for i in range(len(labels)):
             if preds[i] != labels[i]:
                 misclassified_images.append(inputs[i].cpu())
@@ -109,21 +106,21 @@ with torch.no_grad():
                 misclassified_preds.append(preds[i].cpu())
 
 
-# Function to unnormalize image (to show properly)
+# Function to unnormalize image
 def imshow(img, title):
     img = img.numpy().transpose((1, 2, 0))
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
-    img = std * img + mean  # unnormalize
+    img = std * img + mean
     img = np.clip(img, 0, 1)
     plt.imshow(img)
     plt.title(title)
     plt.axis("off")
 
 
-# Show first 12 mistakes
+# Show first 12 misclassified samples
 plt.figure(figsize=(12, 12))
-for idx in range(12):
+for idx in range(min(12, len(misclassified_images))):
     plt.subplot(3, 4, idx + 1)
     true_label = class_names[misclassified_labels[idx]]
     pred_label = class_names[misclassified_preds[idx]]
@@ -131,50 +128,45 @@ for idx in range(12):
 plt.tight_layout()
 plt.show()
 
-# Pick the layer to visualize (last conv layer of ResNet18)
+# =====================
+# Grad-CAM Visualization
+# =====================
+# GradCAM target layer for ResNet50 = "layer4"
 cam_extractor = GradCAM(model, target_layer="layer4")
 
 
-# Function to plot image with CAM overlay
 def show_cam_on_image(img_tensor, cam, title=""):
-    # Unnormalize image
     img = img_tensor.numpy().transpose((1, 2, 0))
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
     img = std * img + mean
     img = np.clip(img, 0, 1)
 
-    # Convert CAM to CPU and resize
-    cam = cam.cpu()  # move to CPU
-    if len(cam.shape) == 3:
-        cam = cam.unsqueeze(0)  # add batch dim if needed
+    cam = cam.cpu()
+    cam = F.interpolate(
+        cam.unsqueeze(0).unsqueeze(0),
+        size=(224, 224),
+        mode="bilinear",
+        align_corners=False,
+    )
+    cam = cam.squeeze().numpy()
+    cam = (cam - cam.min()) / (cam.max() - cam.min())
 
-    # Upsample to image size
-    cam = F.interpolate(cam, size=(224, 224), mode="bilinear", align_corners=False)
-
-    # Remove batch and channel dims properly
-    cam = cam.squeeze()  # removes all size-1 dims
-    # cam should now be (224, 224)
-
-    cam = (cam - cam.min()) / (cam.max() - cam.min())  # normalize
-    heatmap = plt.cm.jet(cam)[..., :3]  # apply colormap → shape (224,224,3)
-
-    # Overlay heatmap on image
+    heatmap = plt.cm.jet(cam)[..., :3]
     overlay = 0.4 * heatmap + 0.6 * img
     plt.imshow(overlay)
     plt.title(title)
     plt.axis("off")
 
 
-# Show Grad-CAM for first 6 misclassified images
+# Show Grad-CAM for first 6 misclassified samples
 plt.figure(figsize=(12, 8))
-for idx in range(6):
+for idx in range(min(6, len(misclassified_images))):
     input_img = misclassified_images[idx].unsqueeze(0).to(DEVICE)
     pred = misclassified_preds[idx].item()
 
-    # Generate CAM
     out = model(input_img)
-    cam = cam_extractor(pred, out)  # CAM for predicted class
+    cam = cam_extractor(pred, out)
 
     plt.subplot(2, 3, idx + 1)
     show_cam_on_image(
@@ -182,6 +174,5 @@ for idx in range(6):
         cam[0],
         title=f"T: {class_names[misclassified_labels[idx]]} | P: {class_names[pred]}",
     )
-
 plt.tight_layout()
 plt.show()
