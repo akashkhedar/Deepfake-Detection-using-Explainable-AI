@@ -56,7 +56,7 @@ ML Project/
 │   ├── check_dataset.py        # Dataset validation utilities
 │   ├── make_mini.py            # Mini dataset creator
 │   ├── requirements.txt        # Python dependencies
-│   ├── resnet18_best.pth       # Trained model weights (binary classifier -- filename kept for backward compatibility)
+│   ├── resnet50_best.pth       # Trained model weights (binary classifier -- filename kept for backward compatibility)
 │   ├── .env                    # Environment variables (API keys)
 │   └── venv/                   # Python virtual environment
 │
@@ -175,8 +175,8 @@ BACKEND_PORT=8000
 
 # Model Configuration
 # NOTE: The codebase now uses ResNet50. The checkpoint filename in this repo remains
-# `resnet18_best.pth` for backward compatibility; update MODEL_PATH if you rename the file.
-MODEL_PATH=resnet18_best.pth
+# `resnet50_best.pth` for backward compatibility; update MODEL_PATH if you rename the file.
+MODEL_PATH=resnet50_best.pth
 DEVICE=auto  # auto, cpu, cuda
 ```
 
@@ -278,7 +278,7 @@ print(f"Explanation: {result['explanation']}")
 
 ### Model Architecture
 
-- **Base Model**: ResNet18 pre-trained on ImageNet -**Base Model**: ResNet50 pre-trained on ImageNet
+- **Base Model**: ResNet50 pre-trained on ImageNet -**Base Model**: ResNet50 pre-trained on ImageNet
 - **Modification**: Final layer adapted for binary classification (Real/Fake)
 - **Input Size**: 224×224×3 RGB images
 - **Output**: 2 classes with softmax probabilities
@@ -473,7 +473,7 @@ npm run lint
 uvicorn main:app --reload
 
 # Run tests
-python test_resnet18.py
+python test_resnet50.py
 
 # Create mini dataset
 python make_mini.py --per_class 1000
@@ -523,7 +523,7 @@ python check_dataset.py --make_sample_grid
 **1. Model Not Found**
 
 ```
-FileNotFoundError: [Errno 2] No such file or directory: 'resnet18_best.pth'
+FileNotFoundError: [Errno 2] No such file or directory: 'resnet50_best.pth'
 ```
 
 **Solution**: Ensure the trained model file exists or retrain the model.
