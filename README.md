@@ -9,11 +9,10 @@ An advanced deepfake detection system powered by an ensemble of state-of-the-art
 
 ## 🌟 Features
 
-- **Ensemble Model Architecture**: Combines 5 powerful CNN models for robust predictions
+- **Ensemble Model Architecture**: Combines 4 powerful CNN models for robust predictions
 
   - ResNet50
   - ResNet152V2
-  - InceptionResNetV2
   - Xception
   - EfficientNetB4
 
@@ -71,7 +70,6 @@ ML Project/
 │   │   ├── xception.py           # Custom Xception implementation
 │   │   ├── resnet50.pth          # 📦 Git LFS (~98 MB)
 │   │   ├── resnet152v2.pth       # 📦 Git LFS (~236 MB)
-│   │   ├── inceptionresnetv2.pth # 📦 Git LFS (~215 MB)
 │   │   ├── xception.pth          # 📦 Git LFS (~88 MB)
 │   │   └── efficientnetb4.pth    # 📦 Git LFS (~75 MB)
 │   └── dataset/                  # Training data (not in repo)
@@ -275,7 +273,7 @@ Each model in the ensemble is a pretrained CNN fine-tuned for binary classificat
 - **Input**: RGB images resized to model-specific dimensions
 
   - ResNet50/152: 224×224
-  - InceptionResNetV2/Xception: 299×299
+  - Xception: 299×299
   - EfficientNetB4: 380×380
 
 - **Output**: 2-class softmax (Real vs Fake)
@@ -293,7 +291,6 @@ Each model in the ensemble is a pretrained CNN fine-tuned for binary classificat
 - Target layers:
 
   - ResNet models: `layer4[-1].conv2`
-  - InceptionResNetV2: `Mixed_7c`
   - Xception: `block4`
   - EfficientNetB4: `features[-1]`
 

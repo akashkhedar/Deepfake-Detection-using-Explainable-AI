@@ -20,17 +20,16 @@ This document summarizes the Git LFS and dataset pointer file implementation for
 
 ### 2. **Model Files in Git LFS**
 
-All 5 model files are now tracked by Git LFS:
+All 4 model files are now tracked by Git LFS:
 
-| Model             | File                    | Size    | LFS Status |
-| ----------------- | ----------------------- | ------- | ---------- |
-| ResNet50          | `resnet50.pth`          | ~90 MB  | ✅ Tracked |
-| ResNet152V2       | `resnet152v2.pth`       | ~666 MB | ✅ Tracked |
-| InceptionResNetV2 | `inceptionresnetv2.pth` | ~623 MB | ✅ Tracked |
-| Xception          | `xception.pth`          | ~80 MB  | ✅ Tracked |
-| EfficientNetB4    | `efficientnetb4.pth`    | ~202 MB | ✅ Tracked |
+| Model          | File                 | Size    | LFS Status |
+| -------------- | -------------------- | ------- | ---------- |
+| ResNet50       | `resnet50.pth`       | ~90 MB  | ✅ Tracked |
+| ResNet152V2    | `resnet152v2.pth`    | ~666 MB | ✅ Tracked |
+| Xception       | `xception.pth`       | ~80 MB  | ✅ Tracked |
+| EfficientNetB4 | `efficientnetb4.pth` | ~202 MB | ✅ Tracked |
 
-**Total Model Size**: ~1.66 GB (stored efficiently in Git LFS)
+**Total Model Size**: ~1.04 GB (stored efficiently in Git LFS)
 
 ### 3. **Dataset Pointer File**
 
@@ -151,7 +150,6 @@ git lfs ls-files
 
 # Expected output:
 # bcba32ddaf * Backend/models/efficientnetb4.pth
-# b3e348283f * Backend/models/inceptionresnetv2.pth
 # 91b85525e1 * Backend/models/resnet152v2.pth
 # 06776d5886 * Backend/models/resnet50.pth
 # 6728f74bad * Backend/models/xception.pth
@@ -234,7 +232,6 @@ Get-ChildItem Backend/models/*.pth | Format-Table Name, @{L="Size (MB)";E={[math
 
 - ✅ `Backend/models/resnet50.pth`
 - ✅ `Backend/models/resnet152v2.pth`
-- ✅ `Backend/models/inceptionresnetv2.pth`
 - ✅ `Backend/models/xception.pth`
 - ✅ `Backend/models/efficientnetb4.pth`
 
@@ -251,7 +248,7 @@ Get-ChildItem Backend/models/*.pth | Format-Table Name, @{L="Size (MB)";E={[math
    - Create dataset download instructions (Backend/DATASET.md)
    - Add model file documentation (Backend/models/README.md)
    - Update main README with Git LFS information
-   - Track all 5 model files with Git LFS (~1.66 GB total)"
+   - Track all 4 model files with Git LFS (~1.04 GB total)"
    ```
 
 2. **Push to Repository**:

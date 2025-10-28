@@ -28,7 +28,6 @@ DEVICE = os.getenv("DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 CHECKPOINTS = {
     "resnet50": "./models/resnet50.pth",
     "resnet152": "./models/resnet152v2.pth",
-    "inceptionresnet": "./models/inceptionresnetv2.pth",
     "xceptionnet": "./models/xception.pth",
     "efficientnetb4": "./models/efficientnetb4.pth",
 }
@@ -36,7 +35,6 @@ CHECKPOINTS = {
 IMG_SIZE_MAP = {
     "resnet50": 224,
     "resnet152": 224,
-    "inceptionresnet": 299,
     "xceptionnet": 299,
     "efficientnetb4": 380,
 }
@@ -93,13 +91,6 @@ class ModelManager:
             num_ftrs = m.fc.in_features
             m.fc = torch.nn.Linear(num_ftrs, num_classes)
             target_layer = m.layer4[-1].conv2
-        elif name == "inceptionresnet":
-            from torchvision.models import inception_v3
-
-            m = inception_v3(weights=None, aux_logits=False)
-            num_ftrs = m.fc.in_features
-            m.fc = torch.nn.Linear(num_ftrs, num_classes)
-            target_layer = getattr(m, "Mixed_7c", None)
         elif name == "xceptionnet":
             try:
                 from models.xception import xception
