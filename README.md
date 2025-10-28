@@ -1,705 +1,462 @@
-# 🧠 AI-Powered Deepfake Detection with Explainable AI
+# Deepfake Detection using Explainable AI
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org)
-[![React](https://img.shields.io/badge/React-19.1.1-61DAFB.svg)](https://reactjs.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.117+-green.svg)](https://fastapi.tiangolo.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![React](https://img.shields.io/badge/react-19.1.1-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-green)
 
-A sophisticated full-stack deepfake detection system that combines state-of-the-art machine learning with explainable AI to identify AI-generated images. The system provides detailed visual explanations using GradCAM attention heatmaps and AI-powered contextual analysis.
+An advanced deepfake detection system powered by an ensemble of state-of-the-art deep learning models with explainable AI capabilities. This project combines multiple CNN architectures with GradCAM visualization and AI-powered explanations to detect manipulated images with high accuracy and transparency.
 
 ## 🌟 Features
 
-### 🎯 **Core Capabilities**
+- **Ensemble Model Architecture**: Combines 5 powerful CNN models for robust predictions
 
-- **Real-time Deepfake Detection**: Binary classification of real vs. AI-generated images
-- **Explainable AI**: GradCAM heatmaps showing which image regions influenced the model's decision
-- **AI-Powered Explanations**: Dynamic explanations generated using Google Gemini AI that analyze attention regions
-- **Interactive Web Interface**: Modern React frontend with drag-and-drop image upload
-- **RESTful API**: FastAPI backend with comprehensive error handling
+  - ResNet50
+  - ResNet152V2
+  - InceptionResNetV2
+  - Xception
+  - EfficientNetB4
 
-### 🔬 **Technical Features**
+- **Explainable AI**:
 
-- **ResNet50 Architecture**: Pre-trained CNN fine-tuned for deepfake detection
-- **GradCAM Visualization**: Visual attention maps highlighting suspicious regions
-- **OpenCV Optimization**: High-performance image processing and heatmap generation
-- **Mobile-Responsive Design**: Optimized UI for desktop and mobile devices
-- **CORS-Enabled API**: Cross-origin support for frontend-backend communication
+  - GradCAM heatmap visualization showing which image regions influenced the decision
+  - AI-generated natural language explanations powered by Google Gemini
+  - Per-model and ensemble confidence scores
 
-### 🤖 **AI Integration**
+- **Modern Web Interface**:
 
-- **Google Gemini Integration**: Context-aware explanations based on model predictions
-- **Multi-modal Analysis**: Combines visual heatmaps with textual explanations
-- **Region-Aware Explanations**: AI analyzes which facial features triggered detection
+  - Responsive React-based UI with Material-UI components
+  - Real-time image analysis
+  - Interactive heatmap overlays
+  - Support for both ensemble and individual model predictions
 
-## 🏗️ Architecture Overview
+- **Production-Ready Backend**:
+  - FastAPI with async support
+  - CORS-enabled for cross-origin requests
+  - GPU/CPU support with automatic device detection
+  - Robust error handling and logging
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   React Frontend │◄──►│   FastAPI Backend │◄──►│  ML Model + AI  │
-│                 │    │                  │    │                 │
-│ • Material-UI   │    │ • PyTorch Model  │    │ • ResNet50      │
-│ • Drag & Drop   │    │ • GradCAM        │    │ • GradCAM       │
-│ • Responsive    │    │ • OpenCV         │    │ • Gemini AI     │
-│ • Modular       │    │ • CORS           │    │ • Explanations  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
+## 📊 Dataset
 
-### 📁 Project Structure
+The model is trained on a comprehensive dataset of real and AI-generated images:
+
+- **Training Set**: 140,002 images (70,001 fake + 70,001 real)
+- **Validation Set**: 39,428 images (19,641 fake + 19,787 real)
+- **Test Set**: 10,905 images (5,492 fake + 5,413 real)
+- **Image Resolution**: 256x256 pixels
+- **Total**: 190,335 images
+
+All images are verified for integrity with zero corruption.
+
+📥 **Dataset is not included in this repository**. See [`Backend/DATASET.md`](Backend/DATASET.md) for download instructions from Kaggle.
+
+## 🏗️ Project Structure
 
 ```
 ML Project/
-├── Backend/                    # FastAPI Server & ML Components
-│   ├── main.py                # FastAPI application with Gemini integration
-│   ├── train_resnet50.py       # Model training script (update: now uses ResNet50)
-│   ├── test_resnet50.py        # Model evaluation script (update: now uses ResNet50)
-│   ├── check_dataset.py        # Dataset validation utilities
-│   ├── make_mini.py            # Mini dataset creator
-│   ├── requirements.txt        # Python dependencies
-│   ├── resnet50_best.pth       # Trained model weights (binary classifier -- filename kept for backward compatibility)
-│   ├── .env                    # Environment variables (API keys)
-│   └── venv/                   # Python virtual environment
+├── .gitattributes                # Git LFS configuration for model files
+├── .gitignore                    # Git ignore patterns
+├── README.md                     # This file
 │
-├── Frontend/                   # React Application
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── HomePage.jsx    # Main application container
-│   │   │   ├── Navbar/         # Navigation component
-│   │   │   └── ModelSection/   # Core detection interface
-│   │   │       ├── ModelSection.jsx      # Main layout component
-│   │   │       ├── ImageUploadArea.jsx   # Drag & drop upload
-│   │   │       ├── ImageDisplay.jsx      # Image preview
-│   │   │       ├── HeatmapDisplay.jsx    # GradCAM visualization
-│   │   │       ├── ExplanationBox.jsx    # AI explanations
-│   │   │       ├── WaitingState.jsx      # Loading states
-│   │   │       └── hooks/
-│   │   │           └── useImageAnalysis.js # Custom React hook
-│   │   ├── App.jsx             # Application router
-│   │   ├── main.jsx            # React entry point
-│   │   └── index.css           # Global styles
-│   ├── package.json            # Node.js dependencies
-│   └── vite.config.js          # Vite build configuration
+├── Backend/                      # FastAPI backend service
+│   ├── main.py                   # FastAPI application & endpoints
+│   ├── service.py                # Model management, inference & GradCAM
+│   ├── check_dataset.py          # Dataset validation utility
+│   ├── requirements.txt          # Python dependencies
+│   ├── DATASET.md                # 📥 Dataset download instructions
+│   ├── .gitignore                # Backend-specific ignore patterns
+│   ├── models/                   # Model weights (Git LFS tracked)
+│   │   ├── README.md             # 📥 Model download & LFS guide
+│   │   ├── __init__.py
+│   │   ├── xception.py           # Custom Xception implementation
+│   │   ├── resnet50.pth          # 📦 Git LFS (~98 MB)
+│   │   ├── resnet152v2.pth       # 📦 Git LFS (~236 MB)
+│   │   ├── inceptionresnetv2.pth # 📦 Git LFS (~215 MB)
+│   │   ├── xception.pth          # 📦 Git LFS (~88 MB)
+│   │   └── efficientnetb4.pth    # 📦 Git LFS (~75 MB)
+│   └── dataset/                  # Training data (not in repo)
+│       ├── Train/                # Download from Kaggle
+│       │   ├── Fake/             # (see DATASET.md)
+│       │   └── Real/
+│       ├── Validation/
+│       │   ├── Fake/
+│       │   └── Real/
+│       └── Test/
+│           ├── Fake/
+│           └── Real/
 │
-└── dataset/                    # Training Data (not included)
-    ├── train/
-    │   ├── Fake/
-    │   └── Real/
-    ├── validation/
-    │   ├── Fake/
-    │   └── Real/
-    └── test/
-        ├── Fake/
-        └── Real/
+└── Frontend/                     # React + Vite frontend
+    ├── src/
+    │   ├── App.jsx               # Main application component
+    │   ├── main.jsx              # React entry point
+    │   ├── index.css             # Global styles
+    │   └── components/
+    │       ├── HomePage.jsx      # Main page with dark theme
+    │       ├── Navbar/
+    │       │   └── Navbar.jsx    # Navigation bar component
+    │       └── ModelSection/
+    │           ├── ModelSection.jsx        # Main analysis interface
+    │           ├── ImageUploadArea.jsx     # Drag & drop upload
+    │           ├── ImageDisplay.jsx        # Original image display
+    │           ├── HeatmapDisplay.jsx      # GradCAM visualization
+    │           ├── ExplanationBox.jsx      # AI explanation display
+    │           ├── RealImageMessage.jsx    # Real image feedback
+    │           ├── WaitingState.jsx        # Loading state
+    │           ├── index.js                # Component exports
+    │           └── hooks/
+    │               └── useImageAnalysis.js # Image analysis logic hook
+    ├── package.json
+    ├── vite.config.js
+    └── eslint.config.js
 ```
 
-## 🚀 Quick Start
+## 🚀 Installation
+
+> **📖 For detailed step-by-step instructions, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
 
 ### Prerequisites
 
-- **Python 3.8+** with pip
-- **Node.js 16+** with npm
-- **CUDA-compatible GPU** (optional, for training)
-- **Google Gemini API Key** ([Get here](https://makersuite.google.com/app/apikey))
+- Python 3.8 or higher
+- Node.js 16+ and npm/yarn
+- **Git LFS** (for downloading model weights) - [Installation Guide](https://git-lfs.com/)
+- CUDA-capable GPU (optional, but recommended for faster inference)
+- Google Gemini API key (for AI explanations)
 
-### 1. Clone Repository
+### Backend Setup
+
+1. **Clone the repository with Git LFS**:
+
+   ```bash
+   # Install Git LFS first (if not already installed)
+   git lfs install
+   
+   # Clone the repository (this will download model files via LFS)
+   git clone <repository-url>
+   cd "ML Project"
+   ```
+   
+   > **Note**: Model files (`.pth`) are stored using Git LFS. If you cloned without Git LFS, run `git lfs pull` to download them. See [`Backend/models/README.md`](Backend/models/README.md) for details.
+
+2. **Download the dataset**:
+
+   The dataset is **not included** in the repository. Follow the instructions in [`Backend/DATASET.md`](Backend/DATASET.md) to download it from Kaggle.
+   
+   Quick start:
+   ```bash
+   # Install Kaggle CLI
+   pip install kaggle
+   
+   # Configure Kaggle credentials (see DATASET.md)
+   # Then download:
+   cd Backend
+   kaggle datasets download -d xhlulu/140k-real-and-fake-faces
+   unzip 140k-real-and-fake-faces.zip -d dataset/
+   ```
+
+3. **Navigate to Backend directory**:
+
+   ```bash
+   cd Backend
+   ```
+
+4. **Create a virtual environment**:
+
+   ```bash
+   python -m venv venv
+
+   # Windows
+   .\venv\Scripts\activate
+
+   # Linux/Mac
+   source venv/bin/activate
+   ```
+
+5. **Install dependencies**:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+6. **Configure environment variables**:
+   Create a `.env` file in the `Backend` directory:
+
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   DEVICE=cuda  # or 'cpu' if no GPU available
+   LOAD_MODELS=all  # or comma-separated model names
+   ```
+
+### Frontend Setup
+
+1. **Navigate to Frontend directory**:
+
+   ```bash
+   cd Frontend
+   ```
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Configure API endpoint** (optional):
+   Create a `.env` file in the `Frontend` directory:
+   ```env
+   VITE_API_BASE=http://localhost:8000
+   ```
+
+## 🎮 Usage
+
+### Starting the Backend
+
+From the `Backend` directory:
 
 ```bash
-git clone https://github.com/akashkhedar/Deepfake-Detection-using-Explainable-AI.git
-cd Deepfake-Detection-using-Explainable-AI
-```
-
-### 2. Backend Setup
-
-```bash
-# Navigate to backend directory
-cd Backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env and add your Gemini API key:
-# GEMINI_API_KEY=your_actual_api_key_here
-
-# Start the FastAPI server
+# Development mode
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# Production mode
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
-### 3. Frontend Setup
+The API will be available at `http://localhost:8000`
+
+#### API Endpoints
+
+- `GET /` - Health check
+- `GET /models/` - List available models
+- `GET /status/` - Get model loading status and device info
+- `POST /predict/` - Analyze an image
+  - Query params: `model` (optional) - specific model name or omit for ensemble
+  - Body: multipart/form-data with image file
+
+### Starting the Frontend
+
+From the `Frontend` directory:
 
 ```bash
-# Navigate to frontend directory (new terminal)
-cd Frontend
-
-# Install dependencies
-npm install
-
-# Start development server
+# Development mode
 npm run dev
+# or
+yarn dev
+
+# Production build
+npm run build
+npm run preview
 ```
 
-### 4. Access Application
+The application will be available at `http://localhost:5173`
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
+### Using the Application
 
-## 🔧 Installation & Configuration
+1. **Open the web interface** at `http://localhost:5173`
+2. **Select a model**:
+   - Choose "Ensemble (All Models)" for combined predictions
+   - Or select an individual model (ResNet50, ResNet152, etc.)
+3. **Upload an image**:
+   - Click "Choose Image" or drag and drop
+   - Supported formats: JPG, JPEG, PNG, BMP, WebP, TIFF
+4. **View results**:
+   - Prediction label (Real/Fake) with confidence score
+   - GradCAM heatmap overlay showing attention regions
+   - AI-generated explanation of the decision
+   - Per-model confidence breakdown (ensemble mode)
 
-### Detailed Backend Setup
-
-#### Environment Configuration
-
-Create a `.env` file in the `Backend/` directory:
-
-```env
-# Gemini API Configuration
-GEMINI_API_KEY=your_actual_gemini_api_key_here
-
-# Optional: OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Backend Configuration
-BACKEND_HOST=localhost
-BACKEND_PORT=8000
-
-# Model Configuration
-# NOTE: The codebase now uses ResNet50. The checkpoint filename in this repo remains
-# `resnet50_best.pth` for backward compatibility; update MODEL_PATH if you rename the file.
-MODEL_PATH=resnet50_best.pth
-DEVICE=auto  # auto, cpu, cuda
-```
-
-#### Virtual Environment Setup
-
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-
-# Install packages
-pip install -r requirements.txt
-```
-
-### Dataset Preparation
-
-#### Using Your Own Dataset
-
-1. **Organize your dataset**:
-
-```
-dataset/
-├── train/
-│   ├── Fake/      # AI-generated images
-│   └── Real/      # Authentic images
-├── validation/
-│   ├── Fake/
-│   └── Real/
-└── test/
-    ├── Fake/
-    └── Real/
-```
-
-2. **Create a mini dataset for testing**:
-
-```bash
-python make_mini.py --src dataset --dst dataset_mini --per_class 2000
-```
-
-3. **Validate dataset integrity**:
-
-```bash
-python check_dataset.py --root dataset --make_sample_grid
-```
-
-## 🎯 Usage Guide
-
-### Web Interface
-
-1. **Open the application** at http://localhost:5173
-2. **Upload an image** by:
-   - Dragging and dropping into the upload area
-   - Clicking "Choose Image" button
-3. **View results**:
-   - **Prediction**: Real or Fake classification
-   - **Heatmap**: Visual attention map showing suspicious regions
-   - **Explanation**: AI-generated contextual analysis
-
-### API Usage
-
-#### Predict Endpoint
-
-```bash
-# Using curl
-curl -X POST "http://localhost:8000/predict/" \
-     -H "accept: application/json" \
-     -H "Content-Type: multipart/form-data" \
-     -F "file=@image.jpg"
-
-# Response
-{
-  "prediction": "Fake",
-  "heatmap": "data:image/png;base64,iVBORw0KGgoA...",
-  "explanation": "The model detected inconsistencies in the facial region, particularly around the eyes and mouth, which are common artifacts in AI-generated images."
-}
-```
-
-#### Python Client Example
-
-```python
-import requests
-
-def predict_image(image_path):
-    with open(image_path, 'rb') as f:
-        files = {'file': f}
-        response = requests.post('http://localhost:8000/predict/', files=files)
-    return response.json()
-
-result = predict_image('test_image.jpg')
-print(f"Prediction: {result['prediction']}")
-print(f"Explanation: {result['explanation']}")
-```
-
-## 🧠 Machine Learning Pipeline
+## 🔬 Technical Details
 
 ### Model Architecture
 
-- **Base Model**: ResNet50 pre-trained on ImageNet -**Base Model**: ResNet50 pre-trained on ImageNet
-- **Modification**: Final layer adapted for binary classification (Real/Fake)
-- **Input Size**: 224×224×3 RGB images
-- **Output**: 2 classes with softmax probabilities
+Each model in the ensemble is a pretrained CNN fine-tuned for binary classification:
 
-### Training Process
+- **Input**: RGB images resized to model-specific dimensions
 
-```bash
-# Train the model
-python train_resnet50.py
+  - ResNet50/152: 224×224
+  - InceptionResNetV2/Xception: 299×299
+  - EfficientNetB4: 380×380
 
-# Configuration options:
-# - DATA_DIR: Dataset directory
-# - BATCH_SIZE: Training batch size (default: 16)
-# - NUM_EPOCHS: Training epochs (default: 8)
-# - LR: Learning rate (default: 1e-4)
-```
+- **Output**: 2-class softmax (Real vs Fake)
 
-#### Training Features
+- **Preprocessing**: ImageNet normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-- **Data Augmentation**: Random horizontal flip, color jitter
-- **Mixed Precision**: AMP for faster training
-- **AdamW Optimizer**: Weight decay regularization
-- **Best Model Saving**: Automatic checkpoint saving
+### Ensemble Strategy
 
-### Model Evaluation
+- **Averaging**: Simple average of softmax probabilities across all models
+- **Prediction**: argmax of ensemble probabilities
+- **Heatmap Fusion**: Weighted average of GradCAM activations based on per-model confidence
 
-```bash
-# Evaluate the trained model
-python test_resnet50.py
-```
+### GradCAM Visualization
 
-#### Evaluation Metrics
+- Target layers:
 
-- **Classification Report**: Precision, Recall, F1-score
-- **Confusion Matrix**: Visual performance analysis
-- **Misclassification Analysis**: Error pattern identification
-- **GradCAM Visualization**: Attention map analysis
+  - ResNet models: `layer4[-1].conv2`
+  - InceptionResNetV2: `Mixed_7c`
+  - Xception: `block4`
+  - EfficientNetB4: `features[-1]`
 
-### GradCAM Integration
+- Overlay composition: 40% heatmap + 60% original image
 
-The system uses GradCAM (Gradient-weighted Class Activation Mapping) to provide visual explanations:
+### AI Explanations
 
-```python
-# GradCAM implementation
-cam_extractor = GradCAM(model, target_layer=model.layer4[-1].conv3)
-cam = cam_extractor(pred_class, output)[0]
-```
+- **Model**: Google Gemini 2.5 Flash
+- **Input**: Prediction label + GradCAM heatmap overlay (base64 PNG)
+- **Output**: 2-3 sentence natural language explanation
+- **Fallback**: Generic explanation if API fails
 
-## 🎨 Frontend Components
+## 📈 Performance
 
-### Component Architecture
+The ensemble approach provides:
 
-#### Core Components
+- **High Accuracy**: Combining multiple architectures reduces individual model biases
+- **Robust Predictions**: Different models capture different fake patterns
+- **Confidence Calibration**: Averaging softmax outputs provides well-calibrated probabilities
 
-1. **ModelSection.jsx**: Main container component
-2. **ImageUploadArea.jsx**: Drag-and-drop file upload
-3. **ImageDisplay.jsx**: Image preview with prediction status
-4. **HeatmapDisplay.jsx**: GradCAM visualization
-5. **ExplanationBox.jsx**: AI-generated explanations
-6. **WaitingState.jsx**: Loading and empty states
+## 🛠️ Utilities
 
-#### Custom Hooks
+### Dataset Validation Tool
 
-**useImageAnalysis.js**: Centralized state management for:
-
-- Image upload handling
-- API communication
-- Loading states
-- Error handling
-
-```javascript
-const {
-  selectedImage,
-  prediction,
-  heatmapUrl,
-  explanation,
-  isAnalyzing,
-  handleImageUpload,
-  handleFileSelect,
-  handleReset,
-} = useImageAnalysis();
-```
-
-### Responsive Design
-
-- **Material-UI Integration**: Professional component library
-- **Mobile-First Design**: Optimized for all device sizes
-- **Dark Theme**: Modern dark color scheme
-- **Accessibility**: ARIA labels and keyboard navigation
-
-## 🔌 API Reference
-
-### Endpoints
-
-#### `GET /`
-
-Health check endpoint
-
-**Response:**
-
-```json
-{
-  "message": "DeepFake Detection API is running"
-}
-```
-
-#### `POST /predict/`
-
-Analyze uploaded image for deepfake detection
-
-**Parameters:**
-
-- `file` (multipart/form-data): Image file (JPG, PNG, WebP)
-
-**Response:**
-
-```json
-{
-  "prediction": "Real|Fake",
-  "heatmap": "data:image/png;base64,...",
-  "explanation": "AI-generated explanation text"
-}
-```
-
-**Error Response:**
-
-```json
-{
-  "error": "Prediction failed: <error_message>"
-}
-```
-
-### CORS Configuration
-
-The API supports cross-origin requests from:
-
-- localhost:3000 (React dev server)
-- localhost:5173 (Vite dev server)
-- localhost:4173 (Vite preview)
-- 127.0.0.1 variants
-
-## 🤖 AI Integration Details
-
-### Google Gemini Integration
-
-The system uses Google's Gemini AI model for generating contextual explanations:
-
-```python
-def call_gemini_with_heatmap(pred_class, overlay_base64):
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content([
-        prompt,
-        {"mime_type": "image/png", "data": base64.b64decode(overlay_base64)}
-    ])
-    return response.text.strip()
-```
-
-#### Features
-
-- **Multi-modal Analysis**: Combines text prompts with heatmap images
-- **Context-Aware**: Tailored explanations based on prediction type
-- **Fallback Handling**: Graceful degradation when API is unavailable
-
-### Explanation Generation
-
-- **Fake Images**: Detailed analysis of suspicious regions with heatmap context
-- **Real Images**: Simple confirmation with natural pattern identification
-- **Error Cases**: Clear error messages with troubleshooting guidance
-
-## 🔧 Development
-
-### Frontend Development
+Validate and analyze the dataset structure:
 
 ```bash
-# Start development server with hot reload
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
+cd Backend
+python check_dataset.py --root dataset --sample_per_class 12 --out dataset_summary.json --make_sample_grid
 ```
 
-### Backend Development
+**Options**:
 
-```bash
-# Start with auto-reload
-uvicorn main:app --reload
+- `--root`: Dataset root directory (default: `dataset`)
+- `--sample_per_class`: Number of sample images per class (default: 12)
+- `--out`: Output JSON file path (default: `dataset_summary.json`)
+- `--make_sample_grid`: Generate thumbnail grids for visual inspection
 
-# Run tests
-python test_resnet50.py
+**Output**:
 
-# Create mini dataset
-python make_mini.py --per_class 1000
+- Corruption detection
+- Image size distribution
+- Class balance statistics
+- Sample thumbnail grids
 
-# Validate dataset
-python check_dataset.py --make_sample_grid
-```
+## 🔧 Configuration
 
-### Adding New Features
+### Backend Environment Variables
 
-#### Frontend Component Creation
+| Variable         | Description                                     | Default                      |
+| ---------------- | ----------------------------------------------- | ---------------------------- |
+| `DEVICE`         | PyTorch device (`cuda` or `cpu`)                | Auto-detect                  |
+| `LOAD_MODELS`    | Models to load (`all` or comma-separated names) | `all`                        |
+| `GEMINI_API_KEY` | Google Gemini API key for explanations          | Required for AI explanations |
 
-1. Create component in `src/components/`
-2. Add PropTypes for type checking
-3. Implement responsive design with Material-UI
-4. Export from `index.js` for clean imports
+### Frontend Environment Variables
 
-#### Backend Endpoint Addition
+| Variable        | Description          | Default                 |
+| --------------- | -------------------- | ----------------------- |
+| `VITE_API_BASE` | Backend API base URL | `http://localhost:8000` |
 
-1. Add route in `main.py`
-2. Implement request/response models
-3. Add error handling
-4. Update CORS if needed
+## 📦 Dependencies
 
-## 📊 Performance Optimization
+### Backend
 
-### Backend Optimizations
+- **Deep Learning**: PyTorch 2.0+, TorchVision 0.15+
+- **Web Framework**: FastAPI 0.100+, Uvicorn 0.23+
+- **Computer Vision**: OpenCV 4.8+, Pillow 9.0+
+- **Explainability**: TorchCAM 0.3+
+- **AI Integration**: google-generativeai 0.3+
+- **Utilities**: NumPy, Pandas, scikit-learn, python-dotenv
 
-- **OpenCV Integration**: 3x faster heatmap generation vs. matplotlib
-- **Mixed Precision Training**: Reduced GPU memory usage
-- **Efficient Image Processing**: Optimized tensor operations
-- **Base64 Encoding**: Direct image transfer without file I/O
+### Frontend
 
-### Frontend Optimizations
-
-- **Vite Build System**: Fast development and optimized production builds
-- **React 19**: Latest performance improvements
-- **Component Memoization**: Reduced re-renders
-- **Lazy Loading**: Code splitting for faster initial load
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Backend Issues
-
-**1. Model Not Found**
-
-```
-FileNotFoundError: [Errno 2] No such file or directory: 'resnet50_best.pth'
-```
-
-**Solution**: Ensure the trained model file exists or retrain the model.
-
-**2. CUDA Issues**
-
-```
-RuntimeError: CUDA out of memory
-```
-
-**Solution**: Reduce batch size or use CPU mode by setting `DEVICE = "cpu"`.
-
-**3. Gemini API Issues**
-
-```
-google.api_core.exceptions.PermissionDenied: 403 API key not valid
-```
-
-**Solution**: Verify your Gemini API key in the `.env` file.
-
-#### Frontend Issues
-
-**1. CORS Errors**
-
-```
-Access to fetch at 'http://localhost:8000' from origin 'http://localhost:5173' has been blocked by CORS policy
-```
-
-**Solution**: Ensure backend CORS middleware includes your frontend URL.
-
-**2. API Connection Failed**
-
-```
-Failed to analyze the image. Please make sure the backend server is running
-```
-
-**Solution**: Verify backend is running on http://localhost:8000.
-
-### Environment Setup Issues
-
-**1. Virtual Environment**
-
-```bash
-# Windows: If activation fails
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-# macOS/Linux: If permission denied
-chmod +x venv/bin/activate
-```
-
-**2. Package Installation**
-
-```bash
-# If pip install fails
-python -m pip install --upgrade pip
-pip install --no-cache-dir -r requirements.txt
-```
-
-## 🔐 Security Considerations
-
-### API Security
-
-- **File Upload Validation**: Only image files accepted
-- **File Size Limits**: Prevent large file uploads
-- **Input Sanitization**: Secure file handling
-- **Error Message Sanitization**: Prevent information leakage
-
-### Environment Variables
-
-- **API Key Protection**: Never commit `.env` files
-- **Access Control**: Restrict API access in production
-- **HTTPS**: Use secure connections in production
-
-## 📈 Future Enhancements
-
-### Planned Features
-
-- **🎥 Video Analysis**: Frame-by-frame deepfake detection
-- **📱 Mobile App**: Native iOS/Android applications
-- **🔍 Batch Processing**: Multiple image analysis
-- **📊 Advanced Analytics**: Detailed metrics dashboard
-- **🌐 Multi-language Support**: Internationalization
-- **🏢 Enterprise Features**: User management and API rate limiting
-
-### Model Improvements
-
-- **🧠 Advanced Architectures**: EfficientNet, Vision Transformers
-- **📚 Larger Datasets**: Training on more diverse data
-- **🎯 Multi-class Detection**: Specific deepfake technique identification
-- **⚡ Real-time Processing**: Optimized inference pipeline
+- **Framework**: React 19.1.1, React Router DOM 7.9.1
+- **UI Library**: Material-UI 7.3.2, Emotion
+- **Build Tool**: Vite 7.1.6
+- **Icons**: MUI Icons Material 7.3.2
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+Contributions are welcome! Please follow these steps:
 
-### Development Workflow
+1. Fork the repository
+2. Install Git LFS: `git lfs install`
+3. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+5. Push to the branch (`git push origin feature/AmazingFeature`)
+6. Open a Pull Request
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Make changes** and **add tests**
-4. **Commit changes**: `git commit -m 'Add amazing feature'`
-5. **Push to branch**: `git push origin feature/amazing-feature`
-6. **Open a Pull Request**
+**Note**: If you're contributing model files, they will automatically be tracked by Git LFS (configured in `.gitattributes`).
 
-### Code Standards
+## 📥 Important: Git LFS for Model Files
 
-- **Python**: Follow PEP 8 style guide
-- **JavaScript**: Use ESLint configuration
-- **Documentation**: Update README for new features
-- **Testing**: Add tests for new functionality
+This repository uses **Git LFS** to manage large model files efficiently. The actual model weights are stored in LFS, while only small pointer files are committed to Git.
 
-## 📄 License
+### For Users Cloning the Repository
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Option 1: Automatic (Recommended)**
+```bash
+# Install Git LFS first
+git lfs install
+
+# Then clone - models download automatically
+git clone <repository-url>
+```
+
+**Option 2: Manual Download**
+```bash
+# If you cloned without Git LFS
+git lfs install
+git lfs pull  # Downloads all LFS files
+```
+
+### Verify Model Downloads
+```bash
+# Check file sizes (should be 75-240 MB each)
+ls -lh Backend/models/*.pth
+
+# Or on Windows PowerShell
+Get-ChildItem Backend/models/*.pth | Format-Table Name, @{L="Size (MB)";E={[math]::Round($_.Length/1MB, 2)}}
+```
+
+If files are only a few KB, they're pointer files - run `git lfs pull`.
+
+### For Contributors Adding Models
+
+Model files are automatically tracked by Git LFS (see `.gitattributes`):
+```bash
+# Just add and commit normally
+git add Backend/models/newmodel.pth
+git commit -m "Add new model"
+git push  # LFS handles the upload automatically
+```
+
+See [`Backend/models/README.md`](Backend/models/README.md) for detailed LFS troubleshooting.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🙏 Acknowledgments
 
-- **PyTorch Team**: For the deep learning framework
-- **Hugging Face**: For model architectures and inspiration
-- **Material-UI Team**: For the React component library
-- **FastAPI Developers**: For the modern Python web framework
-- **Google**: For the Gemini AI API
-- **Research Community**: For GradCAM and explainable AI techniques
+- **PyTorch**: For the deep learning framework
+- **TorchCAM**: For GradCAM implementation
+- **Google Gemini**: For AI-powered explanations
+- **Material-UI**: For the beautiful React components
+- **FastAPI**: For the high-performance web framework
 
-## 📞 Support
+## 📧 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/akashkhedar/Deepfake-Detection-using-Explainable-AI/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/akashkhedar/Deepfake-Detection-using-Explainable-AI/discussions)
-- **Email**: akashkhedar262@gmail.com
+For questions, issues, or suggestions, please open an issue on the GitHub repository.
 
-## 📊 Project Stats
+## 🔮 Future Enhancements
 
-- **🔧 Languages**: Python, JavaScript, CSS, HTML
-- **📚 Framework**: PyTorch, React, FastAPI
-- **🎯 Best Validation Accuracy**: 98.57% (after 8 epochs)
-- **🧪 Test Accuracy**: 88% on the held-out test set
-- **⚡ Performance**: <2s average inference time
-- **📱 Compatibility**: Desktop, tablet, mobile responsive
-
-## 🧾 Training Results
-
-Below are the training and validation metrics recorded during the 8-epoch training run (logs captured from the training terminal). The model used: ResNet50 (final layer adapted for binary classification).
-
-Epoch-by-epoch summary:
-
-- Epoch 1/8 — Train Loss: 0.0691 Acc: 0.9737 | Val Loss: 0.0738 Acc: 0.9727 (Checkpoint saved)
-- Epoch 2/8 — Train Loss: 0.0417 Acc: 0.9837 | Val Loss: 0.0956 Acc: 0.9620 (Checkpoint saved)
-- Epoch 3/8 — Train Loss: 0.0341 Acc: 0.9862 | Val Loss: 0.0644 Acc: 0.9772 (Best so far)
-- Epoch 4/8 — Train Loss: 0.0307 Acc: 0.9876 | Val Loss: 0.0475 Acc: 0.9827 (Best so far)
-- Epoch 5/8 — Train Loss: 0.0269 Acc: 0.9891 | Val Loss: 0.0653 Acc: 0.9759
-- Epoch 6/8 — Train Loss: 0.0245 Acc: 0.9900 | Val Loss: 0.0544 Acc: 0.9797
-- Epoch 7/8 — Train Loss: 0.0220 Acc: 0.9910 | Val Loss: 0.0478 Acc: 0.9844 (Best so far)
-- Epoch 8/8 — Train Loss: 0.0206 Acc: 0.9918 | Val Loss: 0.0438 Acc: 0.9857 (Final best)
-
-- Training complete. Best Validation Accuracy: 0.9857 (98.57%)
-
-Final classification report on the test set (10905 samples):
-
-        precision    recall  f1-score   support
-
-    Fake       0.81      0.98      0.89      5492
-    Real       0.97      0.77      0.86      5413
-
-accuracy 0.88 10905
-macro avg 0.89 0.88 0.88 10905
-weighted avg 0.89 0.88 0.88 10905
-
-Interpretation and notes:
-
-- The model achieves very high validation accuracy (98.57%) during training, indicating strong performance on the held-out validation split.
-- On the test set, overall accuracy is 88%. The class-wise breakdown shows the model is highly precise at detecting Real images (precision 0.97) but has lower recall for Real (0.77). Conversely, Fake images have high recall (0.98) but lower precision (0.81). This indicates the model tends to prefer predicting "Fake" slightly more often, catching most fakery but producing more false positives for the Fake class.
-- The macro- and weighted-average F1-scores (~0.88–0.89) indicate balanced performance across classes when accounting for both precision and recall.
-- Actionable next steps: tune class weights or thresholding to improve Real-class recall, collect more balanced/ diverse Real examples, and experiment with additional architectures or augmentation strategies.
+- [ ] Video deepfake detection
+- [ ] Real-time webcam analysis
+- [ ] Additional model architectures (Vision Transformers, etc.)
+- [ ] Fine-grained manipulation detection (face swap, expression, etc.)
+- [ ] Batch processing API
+- [ ] Model performance benchmarking dashboard
+- [ ] Docker containerization
+- [ ] Cloud deployment guides (AWS, GCP, Azure)
 
 ---
 
-**Built with ❤️ by [Akash Khedar](https://github.com/akashkhedar)**
-
-_Making AI explainable, one detection at a time._
+**Built with ❤️ for transparency in AI-generated content detection**

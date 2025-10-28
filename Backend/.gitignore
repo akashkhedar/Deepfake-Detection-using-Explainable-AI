@@ -3,17 +3,15 @@ __pycache__/
 *.pyc
 venv/
 
-# Data
+# Data - ignore actual dataset files but keep the pointer
 dataset/
-dataset_mini/
+!DATASET.md
 
-# Models
-*.pth
-*.pt
+# Models - tracked by Git LFS, pointer files will be committed
+# *.pth and *.pt are now tracked by Git LFS (see .gitattributes)
 
 # Logs
 *.log
-dataset_summary.json
 
 # env file
 .env
