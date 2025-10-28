@@ -120,6 +120,7 @@ yarn lint
 ## 🔐 Environment Variables
 
 ### Backend `.env`
+
 ```env
 GEMINI_API_KEY=your_api_key_here
 DEVICE=cuda                    # or 'cpu'
@@ -127,6 +128,7 @@ LOAD_MODELS=all                # or 'resnet50,xception'
 ```
 
 ### Frontend `.env`
+
 ```env
 VITE_API_BASE=http://localhost:8000
 ```
@@ -181,12 +183,14 @@ find dataset/Train/Fake -type f | wc -l    # Linux/Mac
 ## 🐛 Common Issues & Fixes
 
 ### Git LFS pointer files instead of actual files
+
 ```bash
 git lfs install
 git lfs pull
 ```
 
 ### Port already in use
+
 ```bash
 # Use different port
 uvicorn main:app --reload --port 8001
@@ -199,6 +203,7 @@ Get-Process -Id (Get-NetTCPConnection -LocalPort 8000).OwningProcess | Stop-Proc
 ```
 
 ### CUDA out of memory
+
 ```bash
 # Load fewer models
 export LOAD_MODELS=resnet50,xception  # Linux/Mac
@@ -210,12 +215,14 @@ $env:DEVICE="cpu"  # Windows PowerShell
 ```
 
 ### Module not found
+
 ```bash
 # Ensure venv is activated, then:
 pip install -r requirements.txt
 ```
 
 ### Node modules issues
+
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules package-lock.json  # Linux/Mac

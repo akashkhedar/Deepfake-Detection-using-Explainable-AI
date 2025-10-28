@@ -1,23 +1,25 @@
 # Pre-trained Model Weights
 
 ## Overview
+
 This directory contains the pre-trained model weights for the deepfake detection ensemble. All model files are tracked using **Git LFS** (Large File Storage).
 
 ## Available Models
 
-| Model | File | Size | Input Size | Parameters |
-|-------|------|------|------------|------------|
-| ResNet50 | `resnet50.pth` | ~98 MB | 224×224 | ~25.6M |
-| ResNet152V2 | `resnet152v2.pth` | ~236 MB | 224×224 | ~60.2M |
-| InceptionResNetV2 | `inceptionresnetv2.pth` | ~215 MB | 299×299 | ~55.8M |
-| Xception | `xception.pth` | ~88 MB | 299×299 | ~22.9M |
-| EfficientNetB4 | `efficientnetb4.pth` | ~75 MB | 380×380 | ~19.3M |
+| Model             | File                    | Size    | Input Size | Parameters |
+| ----------------- | ----------------------- | ------- | ---------- | ---------- |
+| ResNet50          | `resnet50.pth`          | ~98 MB  | 224×224    | ~25.6M     |
+| ResNet152V2       | `resnet152v2.pth`       | ~236 MB | 224×224    | ~60.2M     |
+| InceptionResNetV2 | `inceptionresnetv2.pth` | ~215 MB | 299×299    | ~55.8M     |
+| Xception          | `xception.pth`          | ~88 MB  | 299×299    | ~22.9M     |
+| EfficientNetB4    | `efficientnetb4.pth`    | ~75 MB  | 380×380    | ~19.3M     |
 
 ## Git LFS Setup
 
 These model files are stored using Git LFS. When you clone this repository:
 
 ### Automatic Download (If Git LFS is installed)
+
 If you have Git LFS installed before cloning, the model files will be downloaded automatically:
 
 ```bash
@@ -30,6 +32,7 @@ cd "ML Project/Backend"
 ```
 
 ### Manual Download (If you cloned without Git LFS)
+
 If you cloned the repository without Git LFS, you'll have pointer files instead of actual models. To download them:
 
 ```bash
@@ -41,6 +44,7 @@ git lfs pull
 ```
 
 ### Verify Downloads
+
 Check that model files are actual binary files (not text pointers):
 
 ```bash
@@ -51,8 +55,8 @@ file models/*.pth
 # NOT: "models/resnet50.pth: ASCII text"
 
 # Windows (PowerShell)
-Get-ChildItem models/*.pth | ForEach-Object { 
-    "{0}: {1:N2} MB" -f $_.Name, ($_.Length / 1MB) 
+Get-ChildItem models/*.pth | ForEach-Object {
+    "{0}: {1:N2} MB" -f $_.Name, ($_.Length / 1MB)
 }
 ```
 
@@ -61,6 +65,7 @@ Get-ChildItem models/*.pth | ForEach-Object {
 If you don't have Git LFS installed:
 
 ### Windows
+
 ```bash
 # Using Git for Windows (includes Git LFS)
 # Download from: https://git-scm.com/download/win
@@ -73,6 +78,7 @@ scoop install git-lfs
 ```
 
 ### Linux
+
 ```bash
 # Debian/Ubuntu
 sudo apt-get install git-lfs
@@ -85,6 +91,7 @@ sudo pacman -S git-lfs
 ```
 
 ### macOS
+
 ```bash
 # Using Homebrew
 brew install git-lfs
@@ -94,6 +101,7 @@ sudo port install git-lfs
 ```
 
 After installation:
+
 ```bash
 git lfs install
 ```
@@ -101,22 +109,26 @@ git lfs install
 ## Model Architecture Details
 
 ### ResNet50 & ResNet152V2
+
 - **Architecture**: Deep Residual Networks
 - **Modifications**: Final fully-connected layer replaced for binary classification
 - **Checkpoint**: Fine-tuned on deepfake dataset
 
 ### InceptionResNetV2
+
 - **Architecture**: Hybrid Inception-ResNet architecture
 - **Modifications**: Auxiliary logits disabled, FC layer adapted for 2 classes
 - **Checkpoint**: Fine-tuned on deepfake dataset
 
 ### Xception
+
 - **Architecture**: Depthwise Separable Convolutions
 - **Implementation**: Custom implementation in `xception.py`
 - **Modifications**: Binary classification head
 - **Checkpoint**: Fine-tuned on deepfake dataset
 
 ### EfficientNetB4
+
 - **Architecture**: Efficient compound scaling
 - **Modifications**: Classifier adapted for binary classification
 - **Checkpoint**: Fine-tuned on deepfake dataset
@@ -124,6 +136,7 @@ git lfs install
 ## Training Information
 
 All models were fine-tuned on the 140k Real and Fake Faces dataset:
+
 - **Training Set**: 140,002 images
 - **Validation Set**: 39,428 images
 - **Test Set**: 10,905 images
@@ -167,24 +180,31 @@ python -c "import torch; torch.load('models/resnet50.pth'); print('OK')"
 ## Troubleshooting
 
 ### Issue: Files are text pointers instead of binary
-**Solution**: 
+
+**Solution**:
+
 ```bash
 git lfs install
 git lfs pull
 ```
 
 ### Issue: "This exceeds GitHub's file size limit"
+
 **Solution**: This is normal - the files are stored in Git LFS, not directly in Git. Make sure Git LFS is installed and configured.
 
 ### Issue: Out of memory when loading models
+
 **Solution**: Load models individually instead of all at once:
+
 ```bash
 export LOAD_MODELS=resnet50,xception  # Load only 2 models
 uvicorn main:app --reload
 ```
 
 ### Issue: Model files not found
+
 **Solution**: Ensure you're in the correct directory and have pulled LFS files:
+
 ```bash
 cd Backend
 git lfs pull
@@ -207,6 +227,7 @@ The model weights are licensed under the same license as the project. See the ma
 ## Contributing
 
 If you train improved models or variants, please consider contributing them back:
+
 1. Ensure the model follows the naming convention
 2. Test it with the inference pipeline
 3. Submit a pull request with the model file (Git LFS will handle it)

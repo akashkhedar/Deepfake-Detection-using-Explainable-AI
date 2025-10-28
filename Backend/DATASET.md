@@ -1,6 +1,7 @@
 # Dataset Information
 
 ## Overview
+
 This project uses a deepfake detection dataset containing real and AI-generated images.
 
 ## Dataset Source
@@ -12,11 +13,13 @@ This project uses a deepfake detection dataset containing real and AI-generated 
 ### Option 1: Using Kaggle CLI (Recommended)
 
 1. **Install Kaggle CLI**:
+
    ```bash
    pip install kaggle
    ```
 
 2. **Set up Kaggle API credentials**:
+
    - Go to [Kaggle Account Settings](https://www.kaggle.com/settings)
    - Click "Create New API Token" to download `kaggle.json`
    - Place it in:
@@ -24,16 +27,18 @@ This project uses a deepfake detection dataset containing real and AI-generated 
      - **Windows**: `C:\Users\<YourUsername>\.kaggle\kaggle.json`
 
 3. **Download the dataset**:
+
    ```bash
    cd Backend
    kaggle datasets download -d xhlulu/140k-real-and-fake-faces
    ```
 
 4. **Extract the dataset**:
+
    ```bash
    # Linux/Mac
    unzip 140k-real-and-fake-faces.zip -d dataset/
-   
+
    # Windows (PowerShell)
    Expand-Archive -Path 140k-real-and-fake-faces.zip -DestinationPath dataset/
    ```
@@ -63,11 +68,11 @@ Backend/dataset/
 
 ## Dataset Statistics
 
-| Split      | Fake Images | Real Images | Total   |
-|------------|-------------|-------------|---------|
-| Train      | 70,001      | 70,001      | 140,002 |
-| Validation | 19,641      | 19,787      | 39,428  |
-| Test       | 5,492       | 5,413       | 10,905  |
+| Split      | Fake Images | Real Images | Total       |
+| ---------- | ----------- | ----------- | ----------- |
+| Train      | 70,001      | 70,001      | 140,002     |
+| Validation | 19,641      | 19,787      | 39,428      |
+| Test       | 5,492       | 5,413       | 10,905      |
 | **Total**  | **95,134**  | **95,201**  | **190,335** |
 
 ## Dataset Properties
@@ -89,6 +94,7 @@ python check_dataset.py --root dataset --out dataset_summary.json --make_sample_
 ```
 
 This will:
+
 - Count images in each split and class
 - Check for corrupted images
 - Generate sample thumbnail grids
@@ -97,6 +103,7 @@ This will:
 ## License & Citation
 
 Please refer to the [Kaggle dataset page](https://www.kaggle.com/datasets/xhlulu/140k-real-and-fake-faces) for:
+
 - Dataset license information
 - Citation requirements
 - Original source attribution

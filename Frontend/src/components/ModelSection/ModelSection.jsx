@@ -10,6 +10,10 @@ import {
   CardActions,
   useTheme,
   useMediaQuery,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { CloudUpload, Analytics, ImageSearch } from "@mui/icons-material";
 
@@ -38,6 +42,10 @@ const ModelSection = () => {
     handleImageUpload,
     handleFileSelect,
     handleReset,
+    availableModels,
+    selectedModel,
+    setSelectedModel,
+    confidence,
   } = useImageAnalysis();
 
   return (
@@ -60,6 +68,28 @@ const ModelSection = () => {
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
           Upload an image to analyze whether it's REAL or FAKE
         </Typography>
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+          <FormControl sx={{ minWidth: 220 }} size="small">
+            <InputLabel id="model-select-label">Select Model</InputLabel>
+            <Select
+              labelId="model-select-label"
+              label="Select Model"
+              value={selectedModel ?? "ensemble"}
+              onChange={(e) => {
+                const v = e.target.value;
+                setSelectedModel(v === "ensemble" ? null : v);
+              }}
+            >
+              <MenuItem value="ensemble">Ensemble (All Models)</MenuItem>
+              {availableModels &&
+                availableModels.map((m) => (
+                  <MenuItem value={m} key={m}>
+                    {m}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
 
       {/* Main Content */}
@@ -196,6 +226,7 @@ const ModelSection = () => {
                     heatmapUrl={heatmapUrl}
                     isAnalyzing={isAnalyzing}
                     prediction={prediction}
+                    confidence={confidence}
                   />
                 )}
               </Box>

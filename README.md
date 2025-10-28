@@ -129,23 +129,24 @@ ML Project/
    ```bash
    # Install Git LFS first (if not already installed)
    git lfs install
-   
+
    # Clone the repository (this will download model files via LFS)
    git clone <repository-url>
    cd "ML Project"
    ```
-   
+
    > **Note**: Model files (`.pth`) are stored using Git LFS. If you cloned without Git LFS, run `git lfs pull` to download them. See [`Backend/models/README.md`](Backend/models/README.md) for details.
 
 2. **Download the dataset**:
 
    The dataset is **not included** in the repository. Follow the instructions in [`Backend/DATASET.md`](Backend/DATASET.md) to download it from Kaggle.
-   
+
    Quick start:
+
    ```bash
    # Install Kaggle CLI
    pip install kaggle
-   
+
    # Configure Kaggle credentials (see DATASET.md)
    # Then download:
    cd Backend
@@ -392,6 +393,7 @@ This repository uses **Git LFS** to manage large model files efficiently. The ac
 ### For Users Cloning the Repository
 
 **Option 1: Automatic (Recommended)**
+
 ```bash
 # Install Git LFS first
 git lfs install
@@ -401,6 +403,7 @@ git clone <repository-url>
 ```
 
 **Option 2: Manual Download**
+
 ```bash
 # If you cloned without Git LFS
 git lfs install
@@ -408,6 +411,7 @@ git lfs pull  # Downloads all LFS files
 ```
 
 ### Verify Model Downloads
+
 ```bash
 # Check file sizes (should be 75-240 MB each)
 ls -lh Backend/models/*.pth
@@ -421,6 +425,7 @@ If files are only a few KB, they're pointer files - run `git lfs pull`.
 ### For Contributors Adding Models
 
 Model files are automatically tracked by Git LFS (see `.gitattributes`):
+
 ```bash
 # Just add and commit normally
 git add Backend/models/newmodel.pth

@@ -3,6 +3,7 @@
 This guide will walk you through setting up the Deepfake Detection project from scratch.
 
 ## Table of Contents
+
 - [Prerequisites](#prerequisites)
 - [Step 1: Clone the Repository](#step-1-clone-the-repository)
 - [Step 2: Download Model Weights](#step-2-download-model-weights)
@@ -17,12 +18,14 @@ This guide will walk you through setting up the Deepfake Detection project from 
 Before you begin, ensure you have the following installed:
 
 ### Required Software
+
 - **Python 3.8+**: [Download](https://www.python.org/downloads/)
 - **Node.js 16+**: [Download](https://nodejs.org/)
 - **Git**: [Download](https://git-scm.com/downloads)
 - **Git LFS**: [Download](https://git-lfs.com/) - **IMPORTANT for model files**
 
 ### Optional but Recommended
+
 - **CUDA Toolkit** (for GPU acceleration): [Download](https://developer.nvidia.com/cuda-downloads)
 - **Kaggle Account** (for dataset download): [Sign up](https://www.kaggle.com/)
 - **Google Gemini API Key** (for AI explanations): [Get API Key](https://makersuite.google.com/app/apikey)
@@ -48,6 +51,7 @@ git lfs version   # If not installed, install from https://git-lfs.com/
 ### 1.1 Install Git LFS (If Not Already Installed)
 
 **Windows:**
+
 ```powershell
 # Download and run installer from https://git-lfs.com/
 # Or using Chocolatey:
@@ -58,6 +62,7 @@ scoop install git-lfs
 ```
 
 **Linux:**
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get install git-lfs
@@ -70,6 +75,7 @@ sudo pacman -S git-lfs
 ```
 
 **macOS:**
+
 ```bash
 # Using Homebrew
 brew install git-lfs
@@ -148,6 +154,7 @@ pip install kaggle
 4. This downloads `kaggle.json`
 
 5. Place the file:
+
    - **Linux/Mac**: `~/.kaggle/kaggle.json`
    - **Windows**: `C:\Users\<YourUsername>\.kaggle\kaggle.json`
 
@@ -218,6 +225,7 @@ pip install -r requirements.txt
 ```
 
 This will install:
+
 - PyTorch and TorchVision
 - FastAPI and Uvicorn
 - OpenCV and Pillow
@@ -285,6 +293,7 @@ yarn install
 ```
 
 This will install:
+
 - React and React Router
 - Material-UI
 - Vite
@@ -316,6 +325,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 You should see:
+
 ```
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process
@@ -339,6 +349,7 @@ npm run dev  # or yarn dev
 ```
 
 You should see:
+
 ```
   VITE v7.1.6  ready in XXX ms
 
@@ -349,6 +360,7 @@ You should see:
 ### 6.3 Open the Application
 
 Open your browser and navigate to:
+
 ```
 http://localhost:5173
 ```
@@ -372,6 +384,7 @@ You should see the Deepfake Detection interface!
 **Symptoms**: Model files are < 1 KB in size
 
 **Solution**:
+
 ```bash
 git lfs install
 git lfs pull
@@ -382,6 +395,7 @@ git lfs pull
 **Symptoms**: `401 Unauthorized` when downloading dataset
 
 **Solution**:
+
 - Verify `kaggle.json` is in the correct location
 - Check file permissions: `chmod 600 ~/.kaggle/kaggle.json` (Linux/Mac)
 - Ensure you're logged into Kaggle.com and have accepted competition rules
@@ -391,6 +405,7 @@ git lfs pull
 **Symptoms**: `RuntimeError: CUDA out of memory`
 
 **Solution**:
+
 ```bash
 # Load fewer models
 export LOAD_MODELS=resnet50,xception  # Linux/Mac
@@ -406,6 +421,7 @@ $env:DEVICE="cpu"  # Windows PowerShell
 **Symptoms**: `ModuleNotFoundError: No module named 'xxx'`
 
 **Solution**:
+
 ```bash
 # Ensure virtual environment is activated
 # Then reinstall dependencies
@@ -417,6 +433,7 @@ pip install -r requirements.txt
 **Symptoms**: `Address already in use` or `port 8000 already in use`
 
 **Solution**:
+
 ```bash
 # Use a different port
 uvicorn main:app --reload --port 8001
@@ -430,6 +447,7 @@ echo "VITE_API_BASE=http://localhost:8001" > Frontend/.env
 **Symptoms**: Network errors in browser console
 
 **Solution**:
+
 1. Verify backend is running: `curl http://localhost:8000/`
 2. Check CORS settings in `Backend/main.py`
 3. Verify frontend `.env` has correct API URL
@@ -445,6 +463,7 @@ echo "VITE_API_BASE=http://localhost:8001" > Frontend/.env
 **Symptoms**: Explanations show generic text instead of AI-generated
 
 **Solution**:
+
 - Verify `GEMINI_API_KEY` in `.env`
 - Check API quota at [Google AI Studio](https://makersuite.google.com/)
 - Ensure you have an active API key

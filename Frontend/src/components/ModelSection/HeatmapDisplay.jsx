@@ -11,7 +11,12 @@ import PropTypes from "prop-types";
 
 import { CheckCircle, Warning } from "@mui/icons-material";
 
-const HeatmapDisplay = ({ heatmapUrl, prediction, isAnalyzing }) => {
+const HeatmapDisplay = ({
+  heatmapUrl,
+  prediction,
+  isAnalyzing,
+  confidence,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -84,7 +89,16 @@ const HeatmapDisplay = ({ heatmapUrl, prediction, isAnalyzing }) => {
 
       {/* Prediction Status */}
       {(prediction || isAnalyzing) && (
-        <Box sx={{ textAlign: "center", mt: 1.9, flexShrink: 0 }}>
+        <Box
+          sx={{
+            mt: 1.9,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
           {isAnalyzing ? (
             <Chip
               label="Analyzing..."
@@ -93,15 +107,25 @@ const HeatmapDisplay = ({ heatmapUrl, prediction, isAnalyzing }) => {
               sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem", px: 2 }}
             />
           ) : (
-            <Chip
-              icon={prediction === "real" ? <CheckCircle /> : <Warning />}
-              label={
-                prediction === "real" ? "Real Image" : "Fake Image Detected"
-              }
-              color={prediction === "real" ? "success" : "error"}
-              size={isMobile ? "small" : "medium"}
-              sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem", px: 2 }}
-            />
+            <>
+              <Chip
+                icon={prediction === "real" ? <CheckCircle /> : <Warning />}
+                label={
+                  prediction === "real" ? "Real Image" : "Fake Image Detected"
+                }
+                color={prediction === "real" ? "success" : "error"}
+                size={isMobile ? "small" : "medium"}
+                sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem", px: 2 }}
+              />
+              {typeof confidence === "number" && (
+                <Chip
+                  label={`Confidence: ${(confidence * 100).toFixed(1)}%`}
+                  variant="outlined"
+                  size={isMobile ? "small" : "medium"}
+                  sx={{ fontSize: isMobile ? "0.75rem" : "0.875rem", px: 2 }}
+                />
+              )}
+            </>
           )}
         </Box>
       )}
@@ -113,6 +137,7 @@ HeatmapDisplay.propTypes = {
   heatmapUrl: PropTypes.string,
   prediction: PropTypes.oneOf(["real", "fake", null]),
   isAnalyzing: PropTypes.bool.isRequired,
+  confidence: PropTypes.number,
 };
 
 export default HeatmapDisplay;

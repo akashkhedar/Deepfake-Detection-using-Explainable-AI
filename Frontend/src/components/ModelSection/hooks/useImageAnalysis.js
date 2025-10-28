@@ -1,4 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+
+// In Vite projects, env vars are available under import.meta.env
+const API_BASE =
+  (typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    import.meta.env.VITE_API_BASE) ||
+  "http://localhost:8000";
 
 const useImageAnalysis = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -7,16 +14,42 @@ const useImageAnalysis = () => {
   const [explanation, setExplanation] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const analyzeImage = useCallback(async (imageFile) => {
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState(null); // null => ensemble
+  const [confidence, setConfidence] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/models/`);
+        if (!res.ok) return;
+        const j = await res.json();
+        if (mounted && j.available_models) {
+          setAvailableModels(j.available_models);
+        }
+      } catch (e) {
+        console.log(e);
+        // ignore
+      }
+    })();
+    return () => (mounted = false);
+  }, []);
+
+  const analyzeImage = useCallback(async (imageFile, model = null) => {
     setIsAnalyzing(true);
     setPrediction(null);
     setHeatmapUrl(null);
     setExplanation("");
+    setConfidence(null);
 
     try {
       const formData = new FormData();
       formData.append("file", imageFile);
-      const response = await fetch("http://localhost:8000/predict/", {
+      const url = model
+        ? `${API_BASE}/predict/?model=${encodeURIComponent(model)}`
+        : `${API_BASE}/predict/`;
+      const response = await fetch(url, {
         method: "POST",
         body: formData,
       });
@@ -27,19 +60,25 @@ const useImageAnalysis = () => {
 
       const result = await response.json();
 
-      const predictionLower = result.prediction.toLowerCase();
+      // backend returns either single-model response with 'prediction' or ensemble response with 'ensemble_prediction'
+      const pred = result.prediction || result.ensemble_prediction;
+      const predictionLower = pred ? pred.toLowerCase() : "error";
       setPrediction(predictionLower);
 
-      // Set the heatmap from the base64 string returned by the API
+      // set overall confidence (single-model or ensemble)
+      if (typeof result.confidence === "number") {
+        setConfidence(result.confidence);
+      } else if (typeof result.ensemble_confidence === "number") {
+        setConfidence(result.ensemble_confidence);
+      }
+
       if (result.heatmap) {
         setHeatmapUrl(`data:image/png;base64,${result.heatmap}`);
       }
 
-      // Set explanation from backend (for both fake and real images)
       if (result.explanation) {
         setExplanation(result.explanation);
       } else {
-        // Fallback explanation if backend doesn't provide one
         setExplanation(
           predictionLower === "fake"
             ? "The model detected artificial patterns commonly found in AI-generated images."
@@ -50,7 +89,7 @@ const useImageAnalysis = () => {
       console.error("Error analyzing image:", error);
       setPrediction("error");
       setExplanation(
-        "Failed to analyze the image. Please make sure the backend server is running on 127.0.0.1:8000 and try again."
+        `Failed to analyze the image. Please make sure the backend server is running at ${API_BASE} and try again.`
       );
     } finally {
       setIsAnalyzing(false);
@@ -67,13 +106,13 @@ const useImageAnalysis = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
           setSelectedImage(e.target.result);
-          analyzeImage(file);
+          analyzeImage(file, selectedModel);
         };
         reader.readAsDataURL(file);
       }
     };
     input.click();
-  }, [analyzeImage]);
+  }, [analyzeImage, selectedModel]);
 
   const handleFileSelect = useCallback(
     (file) => {
@@ -81,12 +120,12 @@ const useImageAnalysis = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
           setSelectedImage(e.target.result);
-          analyzeImage(file);
+          analyzeImage(file, selectedModel);
         };
         reader.readAsDataURL(file);
       }
     },
-    [analyzeImage]
+    [analyzeImage, selectedModel]
   );
 
   const handleReset = useCallback(() => {
@@ -95,6 +134,7 @@ const useImageAnalysis = () => {
     setHeatmapUrl(null);
     setExplanation("");
     setIsAnalyzing(false);
+    setConfidence(null);
   }, []);
 
   return {
@@ -107,6 +147,10 @@ const useImageAnalysis = () => {
     handleFileSelect,
     handleReset,
     analyzeImage,
+    availableModels,
+    selectedModel,
+    setSelectedModel,
+    confidence,
   };
 };
 
