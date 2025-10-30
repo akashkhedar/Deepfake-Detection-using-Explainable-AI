@@ -7,22 +7,27 @@ from io import BytesIO
 from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
 from PIL import Image
 
-# Import service module robustly so running `uvicorn main:app` from the Backend
-# folder or running as a package both work.
+# ------------------------------------------------------------
+# ✅ Robust import (works both with and without package context)
+# ------------------------------------------------------------
 try:
     from .service import ModelManager
-except Exception:
-    # fallback to absolute import when module is executed as a script
+except ImportError:
     from service import ModelManager
 
+# ------------------------------------------------------------
+# ✅ Logging
+# ------------------------------------------------------------
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("service")
 
-# --- APP & CORS ---
-app = FastAPI()
+# ------------------------------------------------------------
+# ✅ FastAPI App + CORS
+# ------------------------------------------------------------
+app = FastAPI(title="DeepFake Detection API", version="1.0")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -38,24 +43,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# create manager (models are loaded on startup)
+# ------------------------------------------------------------
+# ✅ Global Model Manager
+# ------------------------------------------------------------
 manager = ModelManager()
 
 
 @app.on_event("startup")
 def startup_event():
-    # read optional env var LOAD_MODELS (comma separated names or 'all')
+    """Load models automatically on API startup."""
     load_cfg = os.getenv("LOAD_MODELS", "all")
+
     if load_cfg.strip().lower() == "all":
         names = None
     else:
         names = [n.strip().lower() for n in load_cfg.split(",") if n.strip()]
+
     try:
         manager.load_models(names=names)
+        logger.info("✅ Models loaded successfully on startup.")
     except Exception as e:
-        logger.exception(f"Error loading models on startup: {e}")
+        logger.exception(f"❌ Error loading models on startup: {e}")
 
 
+# ------------------------------------------------------------
+# ✅ API Endpoints
+# ------------------------------------------------------------
 @app.get("/")
 async def root():
     return {
@@ -65,11 +78,13 @@ async def root():
 
 @app.get("/models/")
 async def get_models():
-    return {"available_models": manager.get_available_models()}
+    """Return list of loaded models."""
+    return {"available_models": manager.get_loaded_models()}
 
 
 @app.get("/status/")
 async def get_status():
+    """Return system and model loading status."""
     return manager.get_status()
 
 
@@ -77,28 +92,35 @@ async def get_status():
 async def predict(
     file: UploadFile = File(...),
     model: str = Query(
-        None, description="Model name (if omitted, ensemble will be used)"
+        None, description="Model name (optional). If omitted, ensemble will be used."
     ),
 ):
+    """Run prediction using a single model or ensemble."""
     try:
         image = Image.open(BytesIO(await file.read())).convert("RGB")
+
+        # ✅ Single model
         if model:
             model = model.lower()
-            if model not in manager.get_available_models():
+            if model not in manager.get_loaded_models():
                 return JSONResponse(
-                    content={"error": f"Model {model} not found."}, status_code=400
+                    content={"error": f"Model '{model}' not found."},
+                    status_code=400,
                 )
             resp = manager.predict_single(model, image)
             return JSONResponse(
                 content=resp, headers={"Access-Control-Allow-Origin": "*"}
             )
+
+        # ✅ Ensemble prediction
         else:
             resp = manager.predict_ensemble(image)
             return JSONResponse(
                 content=resp, headers={"Access-Control-Allow-Origin": "*"}
             )
+
     except Exception as e:
-        logger.exception(f"Error in prediction: {e}")
+        logger.exception(f"❌ Error during prediction: {e}")
         return JSONResponse(
             content={"error": f"Prediction failed: {str(e)}"},
             status_code=500,

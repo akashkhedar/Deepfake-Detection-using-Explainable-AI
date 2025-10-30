@@ -35,7 +35,6 @@
 An advanced deepfake detection system powered by an ensemble of state-of-the-art deep learning models with explainable AI capabilities. This project combines multiple CNN architectures with GradCAM visualization and AI-powered explanations to detect manipulated images with high accuracy and transparency.
 
 **Key Highlights:**
-
 - 🤖 **5-Model Ensemble**: Combines ResNet50, ResNet152V2, InceptionResNetV2, Xception, and EfficientNetB4
 - 🔍 **Explainable AI**: GradCAM heatmaps + Google Gemini-powered natural language explanations
 - 🌐 **Modern Web Interface**: React 19 + Material-UI with real-time analysis
@@ -43,101 +42,97 @@ An advanced deepfake detection system powered by an ensemble of state-of-the-art
 - 📊 **Comprehensive Dataset**: 190,335+ verified images (real and AI-generated)
 - 🎨 **Interactive Visualizations**: Real-time heatmap overlays showing model attention regions
 
+
 ## 🌟 Features
 
 ### Core Capabilities
 
 #### 1. **Multi-Model Ensemble Architecture**
-
-- **5 Powerful CNN Models** working in concert:
-  - **ResNet50** (25.6M parameters) - Residual learning for deep networks
-  - **ResNet152V2** (60.2M parameters) - Deeper residual architecture
-  - **InceptionResNetV2** (55.8M parameters) - Multi-scale feature extraction
-  - **Xception** (22.9M parameters) - Depthwise separable convolutions
-  - **EfficientNetB4** (19.3M parameters) - Compound scaling optimization
-- **Ensemble Prediction**: Weighted averaging of model confidences
-- **Individual Model Selection**: Test specific models or compare results
-- **Robust Decision Making**: Reduces individual model biases
+   - **5 Powerful CNN Models** working in concert:
+     - **ResNet50** (25.6M parameters) - Residual learning for deep networks
+     - **ResNet152V2** (60.2M parameters) - Deeper residual architecture
+     - **InceptionResNetV2** (55.8M parameters) - Multi-scale feature extraction
+     - **Xception** (22.9M parameters) - Depthwise separable convolutions
+     - **EfficientNetB4** (19.3M parameters) - Compound scaling optimization
+   - **Ensemble Prediction**: Weighted averaging of model confidences
+   - **Individual Model Selection**: Test specific models or compare results
+   - **Robust Decision Making**: Reduces individual model biases
 
 #### 2. **Explainable AI (XAI) Framework**
-
-- **GradCAM Heatmap Visualization**:
-  - Shows which image regions influenced the model's decision
-  - Color-coded attention maps (red = high attention, blue = low attention)
-  - Weighted fusion of heatmaps from all ensemble models
-  - Real-time overlay generation with 40% heatmap + 60% original image composition
-- **AI-Generated Natural Language Explanations**:
-  - Powered by Google Gemini 2.5 Flash API
-  - Context-aware explanations based on prediction and heatmap
-  - Human-readable justifications for each decision
-  - Automatic fallback to generic explanations if API unavailable
-- **Per-Model Confidence Breakdown**:
-  - Individual confidence scores for each model
-  - Ensemble confidence aggregation
-  - Real vs Fake probability distribution
-  - Transparency in decision-making process
+   - **GradCAM Heatmap Visualization**: 
+     - Shows which image regions influenced the model's decision
+     - Color-coded attention maps (red = high attention, blue = low attention)
+     - Weighted fusion of heatmaps from all ensemble models
+     - Real-time overlay generation with 40% heatmap + 60% original image composition
+   - **AI-Generated Natural Language Explanations**:
+     - Powered by Google Gemini 2.5 Flash API
+     - Context-aware explanations based on prediction and heatmap
+     - Human-readable justifications for each decision
+     - Automatic fallback to generic explanations if API unavailable
+   - **Per-Model Confidence Breakdown**:
+     - Individual confidence scores for each model
+     - Ensemble confidence aggregation
+     - Real vs Fake probability distribution
+     - Transparency in decision-making process
 
 #### 3. **Modern Web Interface**
-
-- **Responsive React-based UI**:
-  - Mobile-first design with adaptive layouts
-  - Dark theme optimized for visual comfort
-  - Material-UI components for professional appearance
-  - Real-time state management with React hooks
-- **Interactive Features**:
-  - Drag-and-drop image upload
-  - File browser integration
-  - Live analysis progress indicators
-  - Instant result visualization
-  - Model selector dropdown (Ensemble + 5 individual models)
-- **Rich Visual Feedback**:
-  - Original image display with border indicators
-  - Side-by-side heatmap comparison
-  - Color-coded prediction badges (Green = Real, Red = Fake)
-  - Confidence percentage displays
-  - Detailed explanation cards
+   - **Responsive React-based UI**:
+     - Mobile-first design with adaptive layouts
+     - Dark theme optimized for visual comfort
+     - Material-UI components for professional appearance
+     - Real-time state management with React hooks
+   - **Interactive Features**:
+     - Drag-and-drop image upload
+     - File browser integration
+     - Live analysis progress indicators
+     - Instant result visualization
+     - Model selector dropdown (Ensemble + 5 individual models)
+   - **Rich Visual Feedback**:
+     - Original image display with border indicators
+     - Side-by-side heatmap comparison
+     - Color-coded prediction badges (Green = Real, Red = Fake)
+     - Confidence percentage displays
+     - Detailed explanation cards
 
 #### 4. **Production-Ready Backend**
-
-- **FastAPI Framework**:
-  - Async request handling for high performance
-  - Auto-generated OpenAPI documentation (Swagger UI)
-  - Type hints and data validation with Pydantic
-  - RESTful API design
-- **Advanced Features**:
-  - CORS-enabled for cross-origin requests
-  - GPU/CPU automatic device detection
-  - Batch model loading on startup
-  - Robust error handling and logging
-  - Health check endpoints
-  - Model status monitoring
-- **Performance Optimizations**:
-  - Model caching in memory
-  - Efficient image preprocessing pipelines
-  - Parallel GradCAM computation
-  - Optimized tensor operations
+   - **FastAPI Framework**:
+     - Async request handling for high performance
+     - Auto-generated OpenAPI documentation (Swagger UI)
+     - Type hints and data validation with Pydantic
+     - RESTful API design
+   - **Advanced Features**:
+     - CORS-enabled for cross-origin requests
+     - GPU/CPU automatic device detection
+     - Batch model loading on startup
+     - Robust error handling and logging
+     - Health check endpoints
+     - Model status monitoring
+   - **Performance Optimizations**:
+     - Model caching in memory
+     - Efficient image preprocessing pipelines
+     - Parallel GradCAM computation
+     - Optimized tensor operations
 
 #### 5. **Dataset Management**
-
-- **Comprehensive Validation Tools**:
-  - Automatic corruption detection
-  - Image integrity verification
-  - Size distribution analysis
-  - Class balance statistics
-  - Sample grid generation
-- **Flexible Data Organization**:
-  - Train/Validation/Test split structure
-  - Real/Fake binary classification
-  - Standardized 256×256 resolution
-  - Zero corrupted images verified
+   - **Comprehensive Validation Tools**:
+     - Automatic corruption detection
+     - Image integrity verification
+     - Size distribution analysis
+     - Class balance statistics
+     - Sample grid generation
+   - **Flexible Data Organization**:
+     - Train/Validation/Test split structure
+     - Real/Fake binary classification
+     - Standardized 256×256 resolution
+     - Zero corrupted images verified
 
 #### 6. **Developer Experience**
+   - **Git LFS Integration**: Efficient handling of large model files
+   - **Comprehensive Documentation**: Setup guides, API docs, and troubleshooting
+   - **Environment Configuration**: `.env` support for easy customization
+   - **Logging & Debugging**: Detailed logs for monitoring and debugging
+   - **Code Quality**: Type hints, modular architecture, clear separation of concerns
 
-- **Git LFS Integration**: Efficient handling of large model files
-- **Comprehensive Documentation**: Setup guides, API docs, and troubleshooting
-- **Environment Configuration**: `.env` support for easy customization
-- **Logging & Debugging**: Detailed logs for monitoring and debugging
-- **Code Quality**: Type hints, modular architecture, clear separation of concerns
 
 ## 🏛️ System Architecture
 
@@ -351,6 +346,7 @@ User Upload Image
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
 ```
+
 
 The model is trained on a comprehensive dataset of real and AI-generated images:
 
