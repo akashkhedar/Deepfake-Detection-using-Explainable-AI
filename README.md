@@ -588,12 +588,30 @@ Each model in the ensemble is a pretrained CNN fine-tuned for binary classificat
 - **Input**: RGB images resized to model-specific dimensions
 
   - ResNet50/152: 224×224
+  - InceptionResNetV2: 299×299
   - Xception: 299×299
   - EfficientNetB4: 380×380
 
 - **Output**: 2-class softmax (Real vs Fake)
 
 - **Preprocessing**: ImageNet normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
+### Model Performance
+
+| Model                 | Train Acc | Train Loss | Val Acc    | Val Loss |
+| --------------------- | --------- | ---------- | ---------- | -------- |
+| **EfficientNetB4**    | 99.82%    | 0.0050     | 98.68%     | 0.0787   |
+| **InceptionResNetV2** | 99.62%    | 0.0093     | **98.88%** | 0.0441   |
+| **ResNet152V2**       | 99.72%    | 0.0085     | 98.87%     | 0.0506   |
+| **Xception**          | 99.41%    | 0.0048     | 98.79%     | 0.0658   |
+| **ResNet50**          | 99.18%    | 0.0206     | 98.57%     | 0.0438   |
+
+**Key Metrics**:
+
+- Average validation accuracy: **98.76%**
+- Best validation accuracy: **98.88%** (InceptionResNetV2)
+- Minimal overfitting: avg generalization gap of 0.79%
+- All models achieve >98.5% validation accuracy
 
 ### Ensemble Strategy
 

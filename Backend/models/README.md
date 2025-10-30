@@ -6,12 +6,36 @@ This directory contains the pre-trained model weights for the deepfake detection
 
 ## Available Models
 
-| Model          | File                 | Size    | Input Size | Parameters |
-| -------------- | -------------------- | ------- | ---------- | ---------- |
-| ResNet50       | `resnet50.pth`       | ~98 MB  | 224×224    | ~25.6M     |
-| ResNet152V2    | `resnet152v2.pth`    | ~236 MB | 224×224    | ~60.2M     |
-| Xception       | `xception.pth`       | ~88 MB  | 299×299    | ~22.9M     |
-| EfficientNetB4 | `efficientnetb4.pth` | ~75 MB  | 380×380    | ~19.3M     |
+| Model             | File                    | Size    | Input Size | Parameters |
+| ----------------- | ----------------------- | ------- | ---------- | ---------- |
+| ResNet50          | `resnet50.pth`          | ~98 MB  | 224×224    | ~25.6M     |
+| ResNet152V2       | `resnet152v2.pth`       | ~236 MB | 224×224    | ~60.2M     |
+| InceptionResNetV2 | `inceptionresnetv2.pth` | ~215 MB | 299×299    | ~55.8M     |
+| Xception          | `xception.pth`          | ~88 MB  | 299×299    | ~22.9M     |
+| EfficientNetB4    | `efficientnetb4.pth`    | ~75 MB  | 380×380    | ~19.3M     |
+| **Total**         | -                       | ~712 MB | -          | ~183.4M    |
+
+## Model Performance
+
+Training and validation metrics for all models:
+
+| Model                 | Train Accuracy | Train Loss | Val Accuracy | Val Loss |
+| --------------------- | -------------- | ---------- | ------------ | -------- |
+| **EfficientNetB4**    | **99.82%**     | 0.0050     | 98.68%       | 0.0787   |
+| **InceptionResNetV2** | **99.62%**     | 0.0093     | **98.88%**   | 0.0441   |
+| **ResNet152V2**       | **99.72%**     | 0.0085     | 98.87%       | 0.0506   |
+| **Xception**          | 99.41%         | 0.0048     | 98.79%       | 0.0658   |
+| **ResNet50**          | 99.18%         | 0.0206     | 98.57%       | 0.0438   |
+| **Average**           | **99.55%**     | 0.0096     | **98.76%**   | 0.0566   |
+
+**Key Highlights**:
+
+- ✅ All models achieve >98.5% validation accuracy
+- ✅ Average validation accuracy: **98.76%**
+- ✅ Best validation performer: **InceptionResNetV2** (98.88%)
+- ✅ Highest training accuracy: **EfficientNetB4** (99.82%)
+- ✅ Lowest training loss: **Xception** (0.0048)
+- ✅ Minimal overfitting: average generalization gap of 0.79%
 
 ## Git LFS Setup
 

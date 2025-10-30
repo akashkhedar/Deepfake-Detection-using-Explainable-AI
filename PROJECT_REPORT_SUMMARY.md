@@ -128,6 +128,26 @@ Full-Stack Machine Learning Application with Web Interface
 | **EfficientNetB4**    | 380×380    | 19.3M      | 75 MB       | blocks[-1][-1].conv_pwl |
 | **Total**             | -          | **183.4M** | **~712 MB** | -                       |
 
+### Model Training Performance
+
+| Model                 | Train Accuracy | Train Loss | Val Accuracy | Val Loss | Overfitting |
+| --------------------- | -------------- | ---------- | ------------ | -------- | ----------- |
+| **EfficientNetB4**    | **99.82%**     | 0.0050     | 98.68%       | 0.0787   | Low         |
+| **InceptionResNetV2** | **99.62%**     | 0.0093     | **98.88%**   | 0.0441   | Very Low    |
+| **ResNet152V2**       | **99.72%**     | 0.0085     | 98.87%       | 0.0506   | Very Low    |
+| **Xception**          | 99.41%         | 0.0048     | 98.79%       | 0.0658   | Low         |
+| **ResNet50**          | 99.18%         | 0.0206     | 98.57%       | 0.0438   | Low         |
+| **Average**           | **99.55%**     | 0.0096     | **98.76%**   | 0.0566   | Low         |
+
+**Key Observations**:
+
+- All models achieve >98.5% validation accuracy
+- Low generalization gap (avg 0.79%) indicates minimal overfitting
+- InceptionResNetV2 shows best validation accuracy (98.88%)
+- EfficientNetB4 achieves highest training accuracy (99.82%)
+- Xception has lowest training loss (0.0048)
+- Ensemble of these models expected to perform even better
+
 ---
 
 ## 🔬 Methodology
