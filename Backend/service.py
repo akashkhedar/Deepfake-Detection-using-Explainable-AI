@@ -26,7 +26,6 @@ DEVICE = os.getenv("DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
 CHECKPOINTS = {
     "resnet50": "./models/resnet50.pth",
     "resnet152": "./models/resnet152v2.pth",
-    "inceptionresnet": "./models/inceptionresnetv2.pth",
     "xceptionnet": "./models/xception.pth",
     "efficientnetb4": "./models/efficientnetb4.pth",
 }
@@ -34,7 +33,6 @@ CHECKPOINTS = {
 IMG_SIZE_MAP = {
     "resnet50": 224,
     "resnet152": 224,
-    "inceptionresnet": 299,
     "xceptionnet": 299,
     "efficientnetb4": 380,
 }

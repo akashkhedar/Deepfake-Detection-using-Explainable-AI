@@ -6,7 +6,7 @@ This project uses a deepfake detection dataset containing real and AI-generated 
 
 ## Dataset Source
 
-**Kaggle Dataset**: [140k Real and Fake Faces](https://www.kaggle.com/datasets/xhlulu/140k-real-and-fake-faces)
+**Kaggle Dataset**: [140k Real and Fake Faces](https://www.kaggle.com/datasets/manjilkarki/deepfake-and-real-images)
 
 ## Download Instructions
 

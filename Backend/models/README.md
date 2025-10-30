@@ -6,13 +6,12 @@ This directory contains the pre-trained model weights for the deepfake detection
 
 ## Available Models
 
-| Model             | File                    | Size    | Input Size | Parameters |
-| ----------------- | ----------------------- | ------- | ---------- | ---------- |
-| ResNet50          | `resnet50.pth`          | ~98 MB  | 224×224    | ~25.6M     |
-| ResNet152V2       | `resnet152v2.pth`       | ~236 MB | 224×224    | ~60.2M     |
-| InceptionResNetV2 | `inceptionresnetv2.pth` | ~215 MB | 299×299    | ~55.8M     |
-| Xception          | `xception.pth`          | ~88 MB  | 299×299    | ~22.9M     |
-| EfficientNetB4    | `efficientnetb4.pth`    | ~75 MB  | 380×380    | ~19.3M     |
+| Model          | File                 | Size    | Input Size | Parameters |
+| -------------- | -------------------- | ------- | ---------- | ---------- |
+| ResNet50       | `resnet50.pth`       | ~98 MB  | 224×224    | ~25.6M     |
+| ResNet152V2    | `resnet152v2.pth`    | ~236 MB | 224×224    | ~60.2M     |
+| Xception       | `xception.pth`       | ~88 MB  | 299×299    | ~22.9M     |
+| EfficientNetB4 | `efficientnetb4.pth` | ~75 MB  | 380×380    | ~19.3M     |
 
 ## Git LFS Setup
 
@@ -112,12 +111,6 @@ git lfs install
 
 - **Architecture**: Deep Residual Networks
 - **Modifications**: Final fully-connected layer replaced for binary classification
-- **Checkpoint**: Fine-tuned on deepfake dataset
-
-### InceptionResNetV2
-
-- **Architecture**: Hybrid Inception-ResNet architecture
-- **Modifications**: Auxiliary logits disabled, FC layer adapted for 2 classes
 - **Checkpoint**: Fine-tuned on deepfake dataset
 
 ### Xception
