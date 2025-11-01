@@ -1,5 +1,3 @@
-# backend/main.py
-
 import logging
 import os
 from io import BytesIO
@@ -9,23 +7,14 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
-# ------------------------------------------------------------
-# ✅ Robust import (works both with and without package context)
-# ------------------------------------------------------------
 try:
     from .service import ModelManager
 except ImportError:
     from service import ModelManager
 
-# ------------------------------------------------------------
-# ✅ Logging
-# ------------------------------------------------------------
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("service")
 
-# ------------------------------------------------------------
-# ✅ FastAPI App + CORS
-# ------------------------------------------------------------
 app = FastAPI(title="DeepFake Detection API", version="1.0")
 
 app.add_middleware(
@@ -43,9 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ------------------------------------------------------------
-# ✅ Global Model Manager
-# ------------------------------------------------------------
+# Global Model Manager
 manager = ModelManager()
 
 
@@ -66,9 +53,7 @@ def startup_event():
         logger.exception(f"❌ Error loading models on startup: {e}")
 
 
-# ------------------------------------------------------------
-# ✅ API Endpoints
-# ------------------------------------------------------------
+# API Endpoints
 @app.get("/")
 async def root():
     return {
@@ -99,7 +84,6 @@ async def predict(
     try:
         image = Image.open(BytesIO(await file.read())).convert("RGB")
 
-        # ✅ Single model
         if model:
             model = model.lower()
             if model not in manager.get_loaded_models():
@@ -111,8 +95,6 @@ async def predict(
             return JSONResponse(
                 content=resp, headers={"Access-Control-Allow-Origin": "*"}
             )
-
-        # ✅ Ensemble prediction
         else:
             resp = manager.predict_ensemble(image)
             return JSONResponse(
