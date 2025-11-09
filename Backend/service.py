@@ -127,7 +127,29 @@ class ModelManager:
 
         return m, target_layer
 
-    # Safe Checkpoint Loader 
+    # Explain Prediction with Gemini (XAI Text)
+    def explain_prediction(self, image_b64: str, label: str, confidence: float) -> str:
+        """Generate a natural-language explanation using Gemini Vision."""
+        if not self.has_gemini:
+            return "Gemini API key not configured. Explanation unavailable."
+
+        try:
+            img_bytes = base64.b64decode(image_b64)
+            img_obj = {
+                "mime_type": "image/png",
+                "data": img_bytes,
+            }
+
+            prompt = f"Explain briefly (2-3 sentences) why the model predicted the image as {label.lower()} based on the attached heatmap overlay."
+
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            resp = model.generate_content([prompt, img_obj])
+            return resp.text.strip()
+        except Exception as e:
+            logger.warning(f"⚠️ Gemini explanation failed: {e}")
+            return "Explanation could not be generated."
+
+    # Safe Checkpoint Loader
     def load_checkpoint(self, model: torch.nn.Module, path: str, device: str = None):
         device = device or self.device
         if not os.path.exists(path):
@@ -222,29 +244,40 @@ class ModelManager:
 
         return np.clip(unified, 0, 1)
 
-
-
     def _encode_b64(self, img_uint8):
         _, buf = cv2.imencode(".png", cv2.cvtColor(img_uint8, cv2.COLOR_RGB2BGR))
         return base64.b64encode(buf).decode("utf-8")
 
     def _make_overlay(self, pre_tensor, cam_np, target_size):
+        # Resize and normalize CAM
         cam = cv2.resize(cam_np, target_size)
         cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
+
+        # Apply colormap (JET → RGB)
         heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
-        heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
+        heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+
+        # Reconstruct original RGB image
         img = pre_tensor.detach().cpu().numpy().transpose(1, 2, 0)
         img = np.clip(
-            img * np.array([0.229, 0.224, 0.225]) + np.array([0.485, 0.456, 0.406]),
+            img * np.array([0.229, 0.224, 0.225], dtype=np.float32)
+            + np.array([0.485, 0.456, 0.406], dtype=np.float32),
             0,
             1,
         )
         img = cv2.resize(img, target_size)
-        overlay = 0.4 * heatmap + 0.6 * img
-        return (np.clip(overlay, 0, 1) * 255).astype(np.uint8)
+        img = (img * 255).astype(np.uint8)  # ✅ ensure same dtype (uint8)
 
+        # ✅ Blend smoothly with correct dtype
+        alpha = 0.35  # controls heatmap visibility (0.3–0.4 ideal)
+        overlay = cv2.addWeighted(img, 1 - alpha, heatmap, alpha, 0)
 
-    # Single Prediction 
+        # Optional soft blur for smoother appearance
+        overlay = cv2.GaussianBlur(overlay, (7, 7), 0)
+
+        return overlay
+
+    # Single Prediction
     def predict_single(self, model_name: str, image: Image.Image):
         m = self.models_store[model_name]
         cam_ex = self.cam_extractors[model_name]
@@ -254,14 +287,16 @@ class ModelManager:
 
         out = m(inp)
         unified = self._postprocess_output(model_name, out)
-        label_idx = int(np.argmax(unified))  
+        label_idx = int(np.argmax(unified))
         label = "Real" if label_idx == 1 else "Fake"
 
-        cam_tensor = cam_ex(label_idx, out)[0] 
+        cam_tensor = cam_ex(label_idx, out)[0]
         overlay = self._make_overlay(
             inp[0], cam_tensor.squeeze().detach().cpu().numpy(), image.size
         )
         overlay_b64 = self._encode_b64(overlay)
+
+        explanation = self.explain_prediction(overlay_b64, label, float(max(unified)))
 
         return {
             "model": model_name,
@@ -269,26 +304,30 @@ class ModelManager:
             "confidence": float(max(unified)),
             "probabilities": {"real": float(unified[1]), "fake": float(unified[0])},
             "heatmap": overlay_b64,
+            "explanation": explanation,
         }
 
-    #Ensemble Prediction 
+    # Ensemble Prediction
     def predict_ensemble(self, image: Image.Image):
         per_model = {}
         cams, weights, unified_list = [], [], []
         size = image.size
+        sample_input_tensor = None
 
         for name, m in self.models_store.items():
             preprocess = self.preprocess_store[name]
             inp = preprocess(image).unsqueeze(0).to(self.device)
             inp.requires_grad_(True)
+            if sample_input_tensor is None:
+                sample_input_tensor = inp[0]
             out = m(inp)
             unified = self._postprocess_output(name, out)
             unified_list.append(unified)
-            label_idx = int(np.argmax(unified))  
+            label_idx = int(np.argmax(unified))
 
             cam_tensor = self.cam_extractors[name](label_idx, out)[0]
             cam = cam_tensor.squeeze().detach().cpu().numpy()
-            cam = cv2.resize(cam, size, interpolation=cv2.INTER_LINEAR)  
+            cam = cv2.resize(cam, size, interpolation=cv2.INTER_LINEAR)
             cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
             cams.append(cam)
             weights.append(unified[label_idx])
@@ -306,11 +345,15 @@ class ModelManager:
         label = "Real" if np.argmax(avg_unified) == 1 else "Fake"
 
         overlay = self._make_overlay(
-            torch.zeros(3, IMG_SIZE_MAP["resnet50"], IMG_SIZE_MAP["resnet50"]),
+            sample_input_tensor, # Use the actual preprocessed image tensor
             ensemble_cam,
             size,
         )
         overlay_b64 = self._encode_b64(overlay)
+
+        explanation = self.explain_prediction(
+            overlay_b64, label, float(max(avg_unified))
+        )
 
         return {
             "ensemble_prediction": label,
@@ -321,4 +364,5 @@ class ModelManager:
             },
             "per_model_confidences": per_model,
             "heatmap": overlay_b64,
+            "explanation": explanation,
         }
